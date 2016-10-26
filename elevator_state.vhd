@@ -47,17 +47,39 @@ architecture logic of elevator_state is
     end process;
 
     -- describe logic for determining next state
-    process()-- need to put inputs and signals inside of here
-        variable i: positive := 0;
+    process(floor_call, floor_stop, direction, destination)
         begin
         case current_state is
             when idle =>
-                if(idle_up)
+                if(floor_call = '1' and floor_stop = '0' and direction = '1') then
+                    next_state <= up;
+                elsif(floor_call = '1' and floor_stop = '0' and direction = '1') then
+                    next_state <= down;
+                elsif(destination = '0' and floor_stop = '1' and floor_call = '0') then
+                    next_state <= loading;
                 else
                     next_state <= idle;
                 end if;
             case up =>
-                if(direction = '1')
+                if(floor_stop = '1') then
+                    next_state <= loading;
+                else
+                    next_state <= up;
+                end if;
+            case down =>
+                if(floor_stop = '1') then
+                    next_state <= loading;
+                else
+                    next_state <= down;
+                end if;
+            case loading =>
+                if(destination = '0' and floor_stop = '1' and floor_call = '0') then
+                    next_state <= idle;
+                elsif(destination = '1' and direction = '1' and floor_stop = '0') then
+                    next_state <= up;
+                else
+                    next_state <= down;
+                end if;
         end case;
     end process;
 
@@ -66,18 +88,21 @@ architecture logic of elevator_state is
         begin
         -- Initialize state_out to default values so case only covers when they change
         door <= '0';
+        state_out <= "00";
         case current_state is
             when idle =>
-                state_out <= "00";
                 floor_stop <= '0';
             when up =>
                 current_floor <= current_floor + 1;
                 state_out <= "01";
+                direction <= '1';
             when down =>
                 current_floor <= current_floor - 1;
                 state_out <= "10";
+                direction <= '0';
             when loading =>
-                state_out <= "11"'
+                state_out <= "11";
+                door <= '1';
         end case;
     end process moore;
 
@@ -101,6 +126,7 @@ architecture logic of elevator_state is
 
     -- loop through floors to check for floor calls
     check_floor_calls: process(floor_call_array)
+        variable i: positive := 0;
         begin
         while i <= 7 loop
             if(not floor_call_array(i) = 'z') then
