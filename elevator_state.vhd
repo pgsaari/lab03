@@ -33,12 +33,120 @@ architecture logic of elevator_state is
     signal i_direction: std_logic := '1'; --default direction up
     signal i_current_floor: unsigned(3 downto 0) := (others => '0');
 
+    signal i_dest_arr: std_logic_vector(7 downto 0) := destination_array;
+    signal i_floor_call_arr: std_logic_vector(7 downto 0) := floor_call_array;
+
     -- destination = any button pressed inside of elevator
     signal destination: std_logic; -- are we heading towards a destination?
 
     -- floor_call = any button pressed on any floor
     signal floor_call: std_logic; -- is there a floor call anywhere (from idle state)?
 
+	 -------------Functions go before 'begin'--------------
+	 -- process to check if we need to open the doors for our current floor
+    function check_floor_stop(signal cur_floor: unsigned(3 downto 0);
+                              signal dest_arr: std_logic_vector(7 downto 0);
+                              signal floor_call_arr: std_logic_vector(7 downto 0);
+                              signal i_dir: std_logic) 
+    return std_logic is
+	  variable temp: std_logic;
+      begin
+        temp := '0';
+        -- check if we are at a destination floor
+        if(dest_arr(to_integer(cur_floor)) = '1') then
+            temp :='1';
+        end if;
+        -- check if there is a floor call going up
+        if(floor_call_arr(to_integer(cur_floor)) = '1' and i_dir = '1') then
+            temp := '1';
+        end if;
+        -- check if there is a floor call going down
+        if(floor_call_arr(to_integer(cur_floor)) = '0' and i_dir = '0') then
+            temp := '1';
+        end if;
+		return temp;
+    end check_floor_stop;
+
+    -- loop through floors to check for floor calls
+    function check_floor_calls(signal floor_call_arr: std_logic_vector(7 downto 0);
+                               signal cur_floor: unsigned(3 downto 0);
+                               signal dir: std_logic)
+	return std_logic is
+	variable fl_call: std_logic;
+	variable i: integer := 0;
+    begin
+        while i <= 7 loop
+            if(not floor_call_arr(i) = 'Z') then
+                -- there is a floor call above us
+                if(cur_floor < i) then
+                    fl_call := '1';
+                    -- NEED NEW WAY TO SET DIRECTION CANT SET TWO VALUES IN ONE FUNCTION
+                    --dir <= '1';
+                -- there is a floor call below elevator
+                elsif(cur_floor > i) then
+                    fl_call := '1';
+                    --dir <= '0';
+                -- floor call at current floor
+                else
+                    fl_call := '1';
+                end if;
+            exit; -- stop looping once we found the floor_call
+            end if;
+            i := i + 1;
+        end loop;
+	return fl_call;
+    end check_floor_calls;
+	
+	 -- loop through floors to check for destination calls
+    function check_destination_calls(signal dest_arr: std_logic_vector(7 downto 0);
+                                     signal cur_floor: unsigned(3 downto 0);
+                                     signal dir: std_logic)
+	return std_logic is
+--alias av: unsigned(vect'length-1 downto 0) is  floors;
+	variable dest: std_logic;
+	variable i: integer := 0;
+    begin
+		if dir = '1' Then
+			while i <= 7 loop
+				if(dest_arr(i) = '1') then
+					-- there is a destination above us
+					if(cur_floor < i AND dir = '1') then
+						dest := '1';
+					-- there is a destination below elevator
+					elsif(cur_floor > i AND dir = '0') then
+						dest := '1';
+					-- destination at current floor
+					else
+						dest := '0';
+					end if;
+				exit; -- stop looping once we found the floor_call
+				end if;
+				i := i + 1;
+			end loop;
+		else
+			i := 7;
+			while i >= 7 loop
+            if(dest_arr(i) = '1') then
+                -- there is a destination above us
+                if(cur_floor < i AND dir = '1') then
+                    dest := '1';
+                -- there is a destination below elevator
+                elsif(cur_floor > i AND dir = '0') then
+                    dest := '1';
+                -- destination at current floor
+                else
+                    dest := '0';
+                end if;
+            exit; -- stop looping once we found the floor_call
+            end if;
+            i := i - 1;
+			end loop;
+		end if;
+	return dest;
+    end check_destination_calls;
+	 
+------------End function declarations------------- 
+	 
     begin
     -- change state on clk rising_edge
     process(clk)
@@ -53,8 +161,7 @@ architecture logic of elevator_state is
     -- describe logic for determining next state
     process(floor_call, floor_stop, i_direction, destination)
         begin
-		floor_stop <= check_floor_stop(i_current_floor);
-		-- floor_call <= check_floor_calls
+		floor_stop <= check_floor_stop(i_current_floor, i_dest_arr, i_floor_call_arr, i_direction);
         case current_state is
             when idle =>
                 if(floor_call = '1' and floor_stop = '0' and i_direction = '1') then
@@ -98,7 +205,7 @@ architecture logic of elevator_state is
         case current_state is
             when idle =>
                 floor_stop <= '0';
-				floor_call <= check_floor_calls(floor_call_array);
+				floor_call <= check_floor_calls(i_floor_call_arr, i_current_floor, i_direction);
             when up =>
                 i_current_floor <= i_current_floor + 1;
                 state_out <= "01";
@@ -110,105 +217,11 @@ architecture logic of elevator_state is
             when loading =>
                 state_out <= "11";
                 door <= '1';
-				destination_array(to_integer(i_current_floor)) <= '0';
-				floor_call_array(to_integer(i_current_floor)) <= 'Z';
-				destination <= check_destination_calls(destination_array);
+				i_dest_arr(to_integer(i_current_floor)) <= '0';
+				i_floor_call_arr(to_integer(i_current_floor)) <= 'Z';
+				destination <= check_destination_calls(i_dest_arr, i_current_floor, i_direction);
         end case;
     end process moore;
-
-	
-    -- process to check if we need to open the doors for our current floor
-    function check_floor_stop(signal cur_floor: unsigned(3 downto 0))
-		return std_logic is
-		variable temp: std_logic;
-        begin
-        temp := '0';
-        -- check if we are at a destination floor
-        if(destination_array(to_integer(cur_floor)) = '1') then
-            temp :='1';
-        end if;
-        -- check if there is a floor call going up
-        if(floor_call_array(to_integer(cur_floor)) = '1' and i_direction = '1') then
-            temp := '1';
-        end if;
-        -- check if there is a floor call going down
-        if(floor_call_array(to_integer(cur_floor)) = '0' and i_direction = '0') then
-            temp := '1';
-        end if;
-		return temp;
-    end check_floor_stop;
-
-    -- loop through floors to check for floor calls
-    function check_floor_calls(signal floors: std_logic_vector(7 downto 0))
-	return std_logic is
-	variable floor_temp: std_logic;
-	variable i: integer := 0;
-    begin
-        while i <= 7 loop
-            if(not floor_call_array(i) = 'Z') then
-                -- there is a floor call above us
-                if(i_current_floor < i) then
-                    floor_temp <= '1';
-                    i_direction <= '1';
-                -- there is a floor call below elevator
-                elsif(i_current_floor > i) then
-                    floor_temp <= '1';
-                    i_direction <= '0';
-                -- floor call at current floor
-                else
-                    floor_temp <= '1';
-                end if;
-            exit; -- stop looping once we found the floor_call
-            end if;
-            i := i + 1;
-        end loop;
-	return floor_temp;
-    end check_floor_calls;
-	
-	 -- loop through floors to check for destination calls
-    function check_destination_calls(signal floors: std_logic_vector(7 downto 0))
-	return std_logic is
-	variable floor_temp: std_logic;
-	variable i: integer := 0;
-    begin
-		if i_direction = '1' Then
-			while i <= 7 loop
-				if(destination_array(i) = '1') then
-					-- there is a destination above us
-					if(i_current_floor < i AND i_direction = '1') then
-						floor_temp <= '1';
-					-- there is a destination below elevator
-					elsif(i_current_floor > i AND i_direction = '0') then
-						floor_temp <= '1';
-					-- destination at current floor
-					else
-						floor_temp <= '0';
-					end if;
-				exit; -- stop looping once we found the floor_call
-				end if;
-				i := i + 1;
-			end loop;
-		else
-			i := 7;
-			while i >= 7 loop
-            if(destination_array(i) = '1') then
-                -- there is a destination above us
-                if(i_current_floor < i AND i_direction = '1') then
-                    floor_temp <= '1';
-                -- there is a destination below elevator
-                elsif(i_current_floor > i AND i_direction = '0') then
-                    floor_temp <= '1';
-                -- destination at current floor
-                else
-                    floor_temp <= '0';
-                end if;
-            exit; -- stop looping once we found the floor_call
-            end if;
-            i := i - 1;
-			end loop;
-		end if;
-	return floor_temp;
-    end check_destination_calls;
 
 current_floor <= i_current_floor; -- drive floor to output
 direction <= i_direction; -- drive direction to output
