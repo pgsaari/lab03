@@ -9,7 +9,7 @@ z2
 cModel Technology
 Z0 dC:/Users/Paul/Documents/Homework/Digital_Logic_Lab/lab_03
 Eelevator_state
-Z1 w1477885797
+Z1 w1477944554
 Z2 DPx4 ieee 15 std_logic_arith 0 22 [G314=:2zXJ`VORJe1J@Z1
 Z3 DPx4 ieee 18 std_logic_unsigned 0 22 ;eZjO2D4ZDz<]0>8AL<ne1
 Z4 DPx4 ieee 11 numeric_std 0 22 :ASDNFgHXf_ih3J@9F3Ze1
@@ -24,9 +24,9 @@ VLRgieD3fKRKMiVZSlEG[c2
 !s100 Zb2YDbSZFl@Oj?6^RE3Yd0
 Z9 OV;C;10.4d;61
 32
-Z10 !s110 1477885806
+Z10 !s110 1477944588
 !i10b 1
-Z11 !s108 1477885806.000000
+Z11 !s108 1477944588.000000
 Z12 !s90 -reportprogress|300|elevator_state.vhd|elevator_state_tb.vhd|
 Z13 !s107 elevator_state_tb.vhd|elevator_state.vhd|
 !i113 1
@@ -38,10 +38,10 @@ R4
 R5
 R6
 Z15 DEx4 work 14 elevator_state 0 22 LRgieD3fKRKMiVZSlEG[c2
-l150
+l176
 L24
-V7603<Q6GoTVPJ^i6K4CoO2
-!s100 De8Tjo_cJZDJdOB=SEV8C2
+VZe@NcXGWTL]Ic30??IP:A0
+!s100 zHIC_jA1MDL_<oIP5zN1I0
 R9
 32
 R10
@@ -52,7 +52,7 @@ R13
 !i113 1
 R14
 Eelevator_state_tb
-Z16 w1477515271
+Z16 w1477943167
 R2
 R3
 R4
@@ -83,8 +83,8 @@ R6
 Z19 DEx4 work 17 elevator_state_tb 0 22 >7eKDW9ji3iVJa=3o7`o]3
 l52
 L9
-Z20 VeTFVR1z<fZ;:54CdHKGCU2
-Z21 !s100 lJ=[lkdEg>XjTM<SkPBh;1
+Z20 VdModnDCj=g;`4`P06eF>50
+Z21 !s100 ]lnMiDfN4l6m8eXZc;ih30
 R9
 32
 R10

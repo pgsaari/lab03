@@ -8,6 +8,8 @@ add wave -radix binary /destination_array
 add wave -radix binary /elevator_state1/door
 add wave -radix unsigned /elevator_state1/current_floor
 add wave -radix binary /elevator_state1/floor_call
+add wave -radix binary /elevator_state1/floor_stop
+add wave -radix binary /elevator_state1/i_direction
 add wave -radix binary /elevator_state1/destination
 add wave -radix ascii /elevator_state1/current_state
 add wave -radix ascii /elevator_state1/next_state

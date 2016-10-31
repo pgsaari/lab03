@@ -27,8 +27,8 @@ architecture logic of elevator_state is
     type state_type is (idle, up, down, loading);
     signal current_state, next_state: state_type;
 
-    -- do we need to stop at current_floor or not?
-    signal floor_stop: std_logic; 
+    -- signal describes if elevator needs to stop at current floor or not
+    signal floor_stop: std_logic := '0'; 
 
     signal i_direction: std_logic := '1'; --default direction up
     signal i_current_floor: unsigned(3 downto 0) := (others => '0');
@@ -37,13 +37,22 @@ architecture logic of elevator_state is
     signal i_floor_call_arr: std_logic_vector(7 downto 0) := floor_call_array;
 
     -- destination = any button pressed inside of elevator
-    signal destination: std_logic; -- are we heading towards a destination?
+    signal destination: std_logic := '0'; -- are we heading towards a destination?
 
     -- floor_call = any button pressed on any floor
-    signal floor_call: std_logic; -- is there a floor call anywhere (from idle state)?
+    signal floor_call: std_logic := '0'; -- is there a floor call anywhere (from idle state)?
 
 	 -------------Functions go before 'begin'--------------
-	 -- process to check if we need to open the doors for our current floor
+
+	 -- function: check_floor_stop
+     -- description: checks if the elevator needs to stop at the current floor
+     --     for either a floor call in the same direction of the elevator or
+     --     the current floor is a destination floor
+     -- input: cur_floor = unsinged reprentation of current floor
+     --        dest_arr = array that holds all destination floors
+     --        floor_call_arr = array that holds all floor calls
+     --        i_dir = elevators current direction
+     -- output: floor_stop = 1 for stop at floor. 0 for don't stop at floor
     function check_floor_stop(signal cur_floor: unsigned(3 downto 0);
                               signal dest_arr: std_logic_vector(7 downto 0);
                               signal floor_call_arr: std_logic_vector(7 downto 0);
@@ -67,12 +76,20 @@ architecture logic of elevator_state is
 		return temp;
     end check_floor_stop;
 
-    -- loop through floors to check for floor calls
+    -- function: check_floor_calls
+     -- description: loops through the floor call array to check for any floor calls
+     --     within the array, Z = no floor call
+     --                       1 = floor call up
+     --                       0 = floor call down 
+     -- input: floor_call_arr = array that holds all floor calls     
+     --        cur_floor = unsinged reprentation of current floor
+     --        dir = elevators current direction
+     -- output: floor_call = 1 means there is a floor call. 0 for not
     function check_floor_calls(signal floor_call_arr: std_logic_vector(7 downto 0);
                                signal cur_floor: unsigned(3 downto 0);
                                signal dir: std_logic)
 	return std_logic is
-	variable fl_call: std_logic;
+	variable fl_call: std_logic := '0';
 	variable i: integer := 0;
     begin
         while i <= 7 loop
@@ -97,17 +114,24 @@ architecture logic of elevator_state is
 	return fl_call;
     end check_floor_calls;
 	
-	 -- loop through floors to check for destination calls
+	 -- function: check_destination_calls
+     -- description: loops through destination_array to check if the elevator
+     --     is heading towards a destination or not
+     -- input: dest_arr = array that holds all destination floors
+     --        cur_floor = unsinged reprentation of current floor
+     --        i_dir = elevators current direction
+     -- output: destination = 1 for heading to destination 0 for not
     function check_destination_calls(signal dest_arr: std_logic_vector(7 downto 0);
                                      signal cur_floor: unsigned(3 downto 0);
                                      signal dir: std_logic)
 	return std_logic is
---alias av: unsigned(vect'length-1 downto 0) is  floors;
-	variable dest: std_logic;
+	variable dest: std_logic := '0';
 	variable i: integer := 0;
     begin
+        -- check for destinations below elevator first
 		if dir = '1' Then
 			while i <= 7 loop
+                -- if floor we are checking is a destination floor
 				if(dest_arr(i) = '1') then
 					-- there is a destination above us
 					if(cur_floor < i AND dir = '1') then
@@ -123,9 +147,11 @@ architecture logic of elevator_state is
 				end if;
 				i := i + 1;
 			end loop;
+        -- check for destinations above elevator first
 		else
 			i := 7;
 			while i >= 7 loop
+            -- if floor we are checking is a destination floor
             if(dest_arr(i) = '1') then
                 -- there is a destination above us
                 if(cur_floor < i AND dir = '1') then
@@ -161,35 +187,46 @@ architecture logic of elevator_state is
     -- describe logic for determining next state
     process(floor_call, floor_stop, i_direction, destination)
         begin
+        -- set floor_stop bit before entering case statement
 		floor_stop <= check_floor_stop(i_current_floor, i_dest_arr, i_floor_call_arr, i_direction);
         case current_state is
             when idle =>
+                -- idle and floor call above elevator
                 if(floor_call = '1' and floor_stop = '0' and i_direction = '1') then
                     next_state <= up;
+                -- idle and floor call below elevator
                 elsif(floor_call = '1' and floor_stop = '0' and i_direction = '0') then
                     next_state <= down;
+                -- elevator in idle and floor call at current floor
                 elsif(destination = '0' and floor_stop = '1' and floor_call = '1') then
                     next_state <= loading;
                 else
                     next_state <= idle;
                 end if;
             when up =>
+                -- if there is a floor call or destination stop and load passengers
                 if(floor_stop = '1') then
                     next_state <= loading;
+                -- otherwise continue up
                 else
                     next_state <= up;
                 end if;
             when down =>
+                -- if there is a floor call or destination stop and load passengers
                 if(floor_stop = '1') then
                     next_state <= loading;
+                -- otherwise continue down
                 else
                     next_state <= down;
                 end if;
             when loading =>
+                -- not heading to a destination and no floor calls go to idle
                 if(destination = '0' and floor_stop = '1' and floor_call = '0') then
                     next_state <= idle;
+                -- still heading to a destination continue up
                 elsif(destination = '1' and i_direction = '1' and floor_stop = '0') then
                     next_state <= up;
+                -- still heading to destination continue down
                 else
                     next_state <= down;
                 end if;
@@ -205,7 +242,10 @@ architecture logic of elevator_state is
         case current_state is
             when idle =>
                 floor_stop <= '0';
+                ------------------------
+                -- floor call is not getting set in modelsim...
 				floor_call <= check_floor_calls(i_floor_call_arr, i_current_floor, i_direction);
+                -----------------------
             when up =>
                 i_current_floor <= i_current_floor + 1;
                 state_out <= "01";

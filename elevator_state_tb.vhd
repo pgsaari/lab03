@@ -76,8 +76,8 @@ begin
         destination_array <= (others => '0');
         wait for (3*CLK_PER);
 
-        floor_call_array <= "00001000";
-        destination_array <= "10000000";
+        -- floor call at top floor
+        floor_call_array <= "0ZZZZZZZ";
         wait for 3*CLK_PER;
 
         report "End of simulation"
