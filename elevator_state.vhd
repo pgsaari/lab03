@@ -33,9 +33,10 @@ architecture logic of elevator_state is
     signal i_direction: std_logic := '1'; --default direction up
     signal i_current_floor: unsigned(3 downto 0) := (others => '0');
 
-    signal i_dest_arr: std_logic_vector(7 downto 0) := destination_array;
-    signal i_floor_call_arr: std_logic_vector(7 downto 0) := floor_call_array;
-
+    --signal destination_array: std_logic_vector(7 downto 0); --:= destination_array;
+    --signal floor_call_array: std_logic_vector(7 downto 0);-- := floor_call_array;
+	
+	
     -- destination = any button pressed inside of elevator
     signal destination: std_logic := '0'; -- are we heading towards a destination?
 
@@ -93,7 +94,7 @@ architecture logic of elevator_state is
 	variable i: integer := 0;
     begin
         while i <= 7 loop
-            if(not floor_call_arr(i) = 'Z') then
+            if(floor_call_arr(i) = '0') then
                 -- there is a floor call above us
                 if(cur_floor < i) then
                     fl_call := '1';
@@ -107,7 +108,7 @@ architecture logic of elevator_state is
                 else
                     fl_call := '1';
                 end if;
-            exit; -- stop looping once we found the floor_call
+            --exit; -- stop looping once we found the floor_call
             end if;
             i := i + 1;
         end loop;
@@ -188,7 +189,7 @@ architecture logic of elevator_state is
     process(floor_call, floor_stop, i_direction, destination)
         begin
         -- set floor_stop bit before entering case statement
-		floor_stop <= check_floor_stop(i_current_floor, i_dest_arr, i_floor_call_arr, i_direction);
+		floor_stop <= check_floor_stop(i_current_floor, destination_array, floor_call_array, i_direction);
         case current_state is
             when idle =>
                 -- idle and floor call above elevator
@@ -234,7 +235,7 @@ architecture logic of elevator_state is
     end process;
 
     -- describe outputs of the fsm
-    moore: process(current_state)
+    moore: process(current_state, floor_call_array, i_current_floor, i_direction)
         begin
         -- Initialize state_out to default values so case only covers when they change
         door <= '0';
@@ -244,7 +245,7 @@ architecture logic of elevator_state is
                 floor_stop <= '0';
                 ------------------------
                 -- floor call is not getting set in modelsim...
-				floor_call <= check_floor_calls(i_floor_call_arr, i_current_floor, i_direction);
+				floor_call <= check_floor_calls(floor_call_array, i_current_floor, i_direction);
                 -----------------------
             when up =>
                 i_current_floor <= i_current_floor + 1;
@@ -257,12 +258,12 @@ architecture logic of elevator_state is
             when loading =>
                 state_out <= "11";
                 door <= '1';
-				i_dest_arr(to_integer(i_current_floor)) <= '0';
-				i_floor_call_arr(to_integer(i_current_floor)) <= 'Z';
-				destination <= check_destination_calls(i_dest_arr, i_current_floor, i_direction);
+				--destination_array(to_integer(i_current_floor)) <= '0';
+				--floor_call_array(to_integer(i_current_floor)) <= 'Z';
+				destination <= check_destination_calls(destination_array, i_current_floor, i_direction);
         end case;
     end process moore;
-
+	
 current_floor <= i_current_floor; -- drive floor to output
 direction <= i_direction; -- drive direction to output
 end architecture logic;
