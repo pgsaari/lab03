@@ -76,9 +76,39 @@ begin
         destination_array <= (others => '0');
         wait for (3*CLK_PER);
 
-        -- floor call at top floor
-        floor_call_array <= "0ZZZZZZZ";
-        wait for 3*CLK_PER;
+        -- Test Case 1: Elevator responds to floor call from idle state
+        floor_call_array <= "ZZ1ZZZZZ";
+        wait for 20*CLK_PER;
+        floor_call_array <= "ZZZZZZZZ";
+        wait for 5*CLK_PER;
+        report "End of Test Case 1" -- 560 ns
+		severity WARNING;
+
+        -- Test Case 2: Elevator takes pasenger to their destination
+        destination_array <= "00000001";
+        wait for 24*CLK_PER;
+        destination_array <= "00000000";
+        wait for 5 * CLK_PER;
+        report "End of Test Case 2" -- 1140 ns
+		severity WARNING;
+
+        floor_call_array <= "ZZZZZZZ1";
+        destination_array <= "00100000";
+        wait for 4*CLK_PER;
+        floor_call_array <= "ZZZZZZZZ";
+        wait for 5*CLK_PER;
+        floor_call_array <= "ZZZZ1ZZZ";
+        destination_array <= "01100000";
+        wait for 9*CLK_PER;
+        floor_call_array <= "ZZZZZZZZ";
+        wait for 12*CLK_PER;
+        destination_array <= "01000000";
+        wait for 8*CLK_PER;
+        destination_array <= "00000000";
+        wait for 5*CLK_PER;
+        report "End of Test Case 2" -- 2000 ns
+		severity WARNING;
+
 
         report "End of simulation"
         severity FAILURE;
