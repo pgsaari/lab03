@@ -87,9 +87,10 @@ begin
      --     is heading towards a destination or not
      -- input: 
      -- output: 
-    check_destination_bits: process(destination_array, floor_call_array)
+    check_destination_bits: process(clk, destination_array, floor_call_array)
 	variable i: integer := 0;
     begin
+    if(rising_edge(clk)) then
 --------------------------Set Destination bit-------------------------------------
         destination <= '0';
         -- check for destinations below elevator first
@@ -164,6 +165,7 @@ begin
             end if;
             i := i + 1;
         end loop;
+    end if;
 -----------------End set floor call bit---------------------------------
     end process check_destination_bits;
 	 
@@ -257,10 +259,7 @@ begin
                 --i_direction <= '0';
             when loading =>
                 state_out <= "011";
-                door <= '1';
-				--destination_array(to_integer(i_current_floor)) <= '0';
-				--floor_call_array(to_integer(i_current_floor)) <= 'Z';
-				
+                door <= '1';				
             when floor_change =>
                 state_out <= "100";
                 floor_changed <= '0';
