@@ -21,10 +21,11 @@ architecture stimulus of elevator_state_tb is
             direction: out std_logic;
             door: out std_logic; -- 1 for open, 0 for close
             current_floor: out unsigned(3 downto 0) := (others => '0'); -- 8 floors max
-            state_out: out std_logic_vector(1 downto 0)
+            state_out: out std_logic_vector(2 downto 0)
        ); 
     end component elevator_state;
 
+    -- not used yet
     component gen_counter is
         generic (
 		    wide :positive; -- how many bits is the counter

@@ -18,7 +18,7 @@ entity elevator_state is port(
     direction: out std_logic;
     door: out std_logic; -- 1 for open, 0 for close
     current_floor: out unsigned(3 downto 0) := (others => '0'); -- 8 floors max
-    state_out: out std_logic_vector(1 downto 0)
+    state_out: out std_logic_vector(2 downto 0)
 ); end entity;
 
 architecture logic of elevator_state is
@@ -241,27 +241,28 @@ begin
         begin
         -- Initialize state_out to default values so case only covers when they change
         door <= '0';
-        state_out <= "00";
+        state_out <= "000";
         case current_state is
             when idle =>
                 --floor_stop <= '0';
             when up =>
                 i_current_floor <= i_current_floor + 1;
                 floor_changed <= '1';
-                state_out <= "01";
+                state_out <= "001";
                 --i_direction <= '1';
             when down =>
                 i_current_floor <= i_current_floor - 1;
                 floor_changed <= '1';
-                state_out <= "10";
+                state_out <= "010";
                 --i_direction <= '0';
             when loading =>
-                state_out <= "11";
+                state_out <= "011";
                 door <= '1';
 				--destination_array(to_integer(i_current_floor)) <= '0';
 				--floor_call_array(to_integer(i_current_floor)) <= 'Z';
 				
             when floor_change =>
+                state_out <= "100";
                 floor_changed <= '0';
         end case;
     end process moore;
