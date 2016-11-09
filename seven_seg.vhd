@@ -165,6 +165,6 @@ architecture rtl of seven_seg is
 			segs(4) <= '0';
 			segs(5) <= '0';
 			segs(6) <= '0';	
-			
+		end if;
 	end process seven_seg;
 end rtl;
