@@ -54,6 +54,8 @@ floor: process(clk, current_floor, enable) begin
 				i_destination_array(to_integer(which_floor)) <= '1';
 			------------------------------------------
 			end if;
+		else
+		
 		end if;
 
 		if i_destination_array(to_integer(current_floor)) = '1' Then

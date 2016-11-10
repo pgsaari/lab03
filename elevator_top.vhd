@@ -14,7 +14,7 @@ entity elevator_top is Port(
 	HEX0		:out	std_logic_vector( 6 downto 0);	-- DISPLAY STATUS OF ELVATOR NUMBER 0
 	
 	-- ///////////////////////Push Buttons(Reset-Write)//////////////////////
-	KEY		:in		std_logic_vector;	--Pushbutton TO LATCH IN DATA
+	KEY		:in		std_logic;	--Pushbutton TO LATCH IN DATA
 	
 	--////////////////////////	DPDT Switch		////////////////////////
 	--0-3: SPECIFY FLOOR, 4: DIRECTION (UP(1), DOWN(0)), 5: FLOOR CALL(0) OR DESTINATION CALL(1)
@@ -25,7 +25,7 @@ entity elevator_top is Port(
 architecture struct of elevator_top is
 	
 ---------TIE ELEVATOR state to hex display variable----------
-SIGNAL Hex_Link : std_logic_vector(5 DOWNTO 0) := "00000";
+SIGNAL Hex_Link : std_logic_vector(4 DOWNTO 0) := "00000";
 
 ---USED to link 1 sec counter tem and clock of devices to simulate 1 sec counter-----
 signal sec_term	 :std_logic := '0';
@@ -137,7 +137,7 @@ port map(
 --//////////////STATE MACHINE/////////////--
 state_mach : elevator_state port map(
 	 clk => sec_term,
-    term1 => open,
+    term1 => '0',
 
     -- each bit represents a floor: z = no call, 1 = up, 0 = down
     floor_call_array => floor_array,
