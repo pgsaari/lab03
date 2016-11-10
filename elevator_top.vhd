@@ -92,6 +92,7 @@ component floor_control is port(
 	direction: in std_logic; -- This is direction of elevator
 	current_floor: in unsigned(3 downto 0); -- This is current floor of the elevator
 	enable: in std_logic; --Used to tell floor_control when to latch in data
+	state: in std_logic_vector( 2 downto 0); -- state of state machine
 	
 	-- This is the input from top level which essentialy comes from board switches
 	--Bit '5' specifies which array to write to
@@ -169,6 +170,9 @@ f_control : floor_control port map(
     -- each bit represents a floor: z = no call, 1 = up, 0 = down
     floor_call_array => floor_array,
 
+	 --state of state machine
+	 state => state_of_machine,
+	 
     -- buttons pressed inside of elevator
     destination_array => des_array
 );
