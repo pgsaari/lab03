@@ -11,7 +11,7 @@ entity elevator_state is port(
     floor_call_array: in std_logic_vector(7 downto 0) := (others => 'Z');
 
     -- buttons pressed inside of elevator
-    destination_array: in std_logic_vector(7 downto 0);
+    destination_array: in std_logic_vector(7 downto 0) := (others => '0');
 
 
     en1: out std_logic; -- timer to stay on a state
@@ -30,15 +30,14 @@ architecture logic of elevator_state is
     -- keep track if floor changed or not
     signal floor_changed: std_logic := '0';
 
+    -- keep track of if elevator is in idle or not
+    signal in_idle: std_logic;
+
     -- signal describes if elevator needs to stop at current floor or not
     signal floor_stop: std_logic := '0'; 
 
     signal i_direction: std_logic := '1'; --default direction up
     signal i_current_floor: unsigned(3 downto 0) := (others => '0');
-
-    --signal destination_array: std_logic_vector(7 downto 0); --:= destination_array;
-    --signal floor_call_array: std_logic_vector(7 downto 0);-- := floor_call_array;
-	
 	
     -- destination = any button pressed inside of elevator
     signal destination: std_logic := '0'; -- are we heading towards a destination?
@@ -46,42 +45,33 @@ architecture logic of elevator_state is
     -- floor_call = any button pressed on any floor
     signal floor_call: std_logic := '0'; -- is there a floor call anywhere (from idle state)?
 
-	 -------------Functions go before 'begin'--------------
+begin	
 
-	 -- function: check_floor_stop
+    -- process: check_floor_stop
      -- description: checks if the elevator needs to stop at the current floor
      --     for either a floor call in the same direction of the elevator or
      --     the current floor is a destination floor
-     -- input: cur_floor = unsinged reprentation of current floor
-     --        dest_arr = array that holds all destination floors
-     --        floor_call_arr = array that holds all floor calls
-     --        i_dir = elevators current direction
-     -- output: floor_stop = 1 for stop at floor. 0 for don't stop at floor
-    function check_floor_stop(signal cur_floor: unsigned(3 downto 0);
-                              signal dest_arr: std_logic_vector(7 downto 0);
-                              signal floor_call_arr: std_logic_vector(7 downto 0);
-                              signal i_dir: std_logic) 
-    return std_logic is
-	  variable temp: std_logic := '0';
-      begin
-        -- check if we are at a destination floor or at floor call floor
-        if(dest_arr(to_integer(cur_floor)) = '1' or (not floor_call_arr(to_integer(cur_floor)) = 'Z')) then
-            temp :='1';
-        -- check if there is a floor call going up
-        elsif(floor_call_arr(to_integer(cur_floor)) = '1' and i_dir = '1') then
-            temp := '1';
-        -- check if there is a floor call going down
-        elsif(floor_call_arr(to_integer(cur_floor)) = '0' and i_dir = '0') then
-            temp := '1';
-        else
-            temp := '0';
+    check_floor_stop: process(clk, i_current_floor, destination_array, floor_call_array, i_direction)
+    begin
+        if falling_edge(clk) then
+            -- check if we are at a destination floor or at floor call floor
+            if(destination_array(to_integer(i_current_floor)) = '1' ) then
+                floor_stop <= '1';
+            -- elevator in idle and floor call at current_floor
+            elsif(in_idle = '1' and (floor_call_array(to_integer(i_current_floor)) = '1' or floor_call_array(to_integer(i_current_floor)) = '0' )) then
+                floor_stop <= '1';
+            -- check if there is a floor call going up
+            elsif(floor_call_array(to_integer(i_current_floor)) = '1' and i_direction = '1') then
+                floor_stop <= '1';
+            -- check if there is a floor call going down
+            elsif(floor_call_array(to_integer(i_current_floor)) = '0' and i_direction = '0') then
+                floor_stop <= '1';
+            else
+                floor_stop <= '0';
+            end if;
         end if;
-		return temp;
-    end check_floor_stop;
+    end process;
 
-------------End function declarations------------- 
-
-begin	
 	 -- process: check_destination_calls
      -- description: loops through destination_array to check if the elevator
      --     is heading towards a destination or not
@@ -115,7 +105,7 @@ begin
 				i := i - 1;
 			end loop;
         -- check for destinations above elevator first
-		else
+		else -- i_direction = '0'
             i := 0;
 			while i <= 7 loop
             -- if floor we are checking is a destination floor
@@ -168,9 +158,7 @@ begin
     end if;
 -----------------End set floor call bit---------------------------------
     end process check_destination_bits;
-	 
-	 
-    
+
     -- change state on clk rising_edge
     process(clk)
         begin
@@ -182,11 +170,12 @@ begin
     end process;
     
 
+
     -- describe logic for determining next state
     process(floor_call, floor_stop, i_direction, destination, i_current_floor, floor_changed, destination_array)
         begin
         -- set floor_stop bit before entering case statement
-		floor_stop <= check_floor_stop(i_current_floor, destination_array, floor_call_array, i_direction);
+		--floor_stop <= check_floor_stop(i_current_floor, destination_array, floor_call_array, i_direction);
         case current_state is
             when idle =>
                 -- idle and floor call above elevator
@@ -244,9 +233,10 @@ begin
         -- Initialize state_out to default values so case only covers when they change
         door <= '0';
         state_out <= "000";
+        in_idle <= '0';
         case current_state is
             when idle =>
-                --floor_stop <= '0';
+                in_idle <= '1';
             when up =>
                 i_current_floor <= i_current_floor + 1;
                 floor_changed <= '1';

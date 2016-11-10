@@ -8,6 +8,7 @@ entity floor_control is port(
 	direction: in std_logic; -- This is direction of elevator
 	current_floor: in unsigned(3 downto 0); -- This is current floor of the elevator
 	enable: in std_logic; --Used to tell floor_control when to latch in data
+	state: in std_logic_vector(2 downto 0);
 	
 	-- This is the input from top level which essentialy comes from board switches
 	--Bit '4' specifies which array to write to
@@ -19,7 +20,7 @@ entity floor_control is port(
     floor_call_array: out std_logic_vector(7 downto 0) := (others => 'Z');
 
     -- buttons pressed inside of elevator
-    destination_array: out std_logic_vector(7 downto 0)--:= (others => '0')
+    destination_array: out std_logic_vector(7 downto 0) := (others => '0')
 
 ); end entity;
 
@@ -50,9 +51,7 @@ floor: process(clk, current_floor, enable) begin
 					i_floor_call_array(to_integer(which_floor)) <= 'Z';
 				end if;
 			else -- which array = 1
-			----SETTING BITS TO X------------------------
-				i_destination_array(to_integer(which_floor)) <= '1';
-			------------------------------------------
+					i_destination_array(to_integer(which_floor)) <= '1';
 			end if;
 		else
 		
@@ -60,6 +59,10 @@ floor: process(clk, current_floor, enable) begin
 
 		if i_destination_array(to_integer(current_floor)) = '1' Then
 			i_destination_array(to_integer(current_floor)) <= '0';
+		end if;
+
+		if (state = "000" and (i_floor_call_array(to_integer(current_floor)) = '1' or i_floor_call_array(to_integer(current_floor)) = '0' )) then
+			i_floor_call_array(to_integer(current_floor)) <= 'Z';
 		end if;
 
 		if direction = '1' AND i_floor_call_array(to_integer(current_floor)) = '1' Then
@@ -71,23 +74,6 @@ floor: process(clk, current_floor, enable) begin
 		end if;
 	end if;
 end process;
-
---This will add and remove remove destination calls whithin i_destination_array
---'1' There is a floor call at specified floor(index) to go "UP"
---'0' There is no floor call at specified location
--- Dest: process(clk, current_floor, enable) begin
--- 	if(falling_edge(clk)) then
--- 		if enable = '1' then
--- 			if which_array = '1' Then
--- 				i_destination_array(to_integer(which_floor)) <= '1';
--- 			end if;
--- 		end if;
-		
--- 		if i_destination_array(to_integer(current_floor)) = '1' Then
--- 			i_destination_array(to_integer(current_floor)) <= '0';
--- 		end if;
--- 	end if;
--- end process;
 
 --Sets latched data from board to easy to use variables
 latch: process(input_array) begin
