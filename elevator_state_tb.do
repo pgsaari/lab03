@@ -18,4 +18,5 @@ add wave -radix binary /enable
 add wave -radix binary /floor_control1/which_array
 add wave -radix binary /floor_control1/which_direction
 add wave -radix unsigned /floor_control1/which_floor
+add wave -radix binary /elevator_state1/in_idle
 run 1000 ns
