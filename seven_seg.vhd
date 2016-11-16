@@ -27,24 +27,24 @@ architecture rtl of seven_seg is
 			segs(4) <= '1';
 			segs(5) <= '1';
 			segs(6) <= '0';	
-		elsif(state = "001") then -- up state
-			-- display an up arrow, kinda...
-			segs(0) <= '0';
-			segs(1) <= '0';
-			segs(2) <= '1';
-			segs(3) <= '1';
-			segs(4) <= '0';
-			segs(5) <= '0';
-			segs(6) <= '1';	
-		elsif(state = "010") then -- down state
+		--elsif(state = "001") then -- up state
+			---- display an up arrow, kinda...
+			--segs(0) <= '0';
+			--segs(1) <= '0';
+			--segs(2) <= '1';
+			--segs(3) <= '1';
+			--segs(4) <= '0';
+			--segs(5) <= '0';
+			--segs(6) <= '1';	
+		--elsif(state = "010") then -- down state
 			-- display a down arrow
-			segs(0) <= '1';
-			segs(1) <= '0';
-			segs(2) <= '0';
-			segs(3) <= '0';
-			segs(4) <= '0';
-			segs(5) <= '1';
-			segs(6) <= '1';	
+			--segs(0) <= '1';
+			--segs(1) <= '0';
+			--segs(2) <= '0';
+			--segs(3) <= '0';
+			--segs(4) <= '0';
+			--segs(5) <= '1';
+			--segs(6) <= '1';	
 		elsif(state = "011") then -- loading state
 			-- display an 'L'
 			segs(0) <= '1';
@@ -54,7 +54,7 @@ architecture rtl of seven_seg is
 			segs(4) <= '0';
 			segs(5) <= '0';
 			segs(6) <= '1';							
-		elsif(state = "100") then -- floor change state
+		elsif(state = "001" OR state ="010") then -- if state is going up or down
 			-- display current floor
 			case unsigned(floor) is
 				when "0000" => -- 0

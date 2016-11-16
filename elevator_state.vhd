@@ -168,9 +168,9 @@ begin
 	--increment/decrement floor
 	process(clk, current_state) begin
 		if falling_edge(clk) Then
-			if(floor_changed = '1' AND current_state = up) then
+			if(next_state=up)Then --AND current_state = up) then
 				i_current_floor <= i_current_floor +1;
-			elsif (floor_changed = '1' AND current_state = down) Then
+			elsif (next_state=down) Then-- AND current_state = down) Then
 				i_current_floor <= i_current_floor - 1;
 			end if;
 		end if;

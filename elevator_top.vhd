@@ -171,7 +171,7 @@ f_control : floor_control port map(
    clk => sec_term, -- This is clock
 	direction => direction_of_elevator, -- This is direction of elevator
 	current_floor => elvator_current_floor, -- This is current floor of the elevator
-	enable => kEY, --Used to tell floor_control when to latch in data
+	enable => KEY, --Used to tell floor_control when to latch in data
 	
 	-- This is the input from top level which essentialy comes from board switches
 	--Bit '5' specifies which array to write to
