@@ -1,7 +1,7 @@
 Quartus Prime Archive log --	C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/Elevator.qarlog
 
 Archive:	C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/Elevator.qar
-Date:		Tue Nov 01 15:12:23 2016
+Date:		Wed Nov 09 20:43:09 2016
 Quartus Prime		16.0.0 Build 211 04/27/2016 SJ Lite Edition
 
 	=========== Files Selected: ===========
@@ -9,10 +9,12 @@ C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/Elevator.qpf
 C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/Elevator.qsf
 C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/elevator_state.vhd
 C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/elevator_state_tb.vhd
+C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/elevator_top.vhd
+C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/floor_control.vhd
 C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/gen_counter.vhd
 C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/seven_seg.vhd
 c:/users/ricardo/documents/altera/quartus/bin64/assignment_defaults.qdf
-	======= Total: 7 files to archive =======
+	======= Total: 9 files to archive =======
 
 	================ Status: ===============
 All files archived successfully.

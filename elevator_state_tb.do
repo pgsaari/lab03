@@ -3,7 +3,8 @@ vcom elevator_state.vhd floor_control.vhd elevator_state_tb.vhd
 vsim -t ns work.elevator_state_tb
 view wave
 add wave -radix binary /clk
-add wave -radix binary /floor_call_array
+add wave -radix binary /floor_call_array_up
+add wave -radix binary /floor_call_array_down
 add wave -radix binary /destination_array
 add wave -radix binary /elevator_state1/door
 add wave -radix unsigned /elevator_state1/current_floor

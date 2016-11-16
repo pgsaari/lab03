@@ -7,8 +7,11 @@ entity elevator_state is port(
     clk: in std_logic;
     term1: in std_logic;
 
-    -- each bit represents a floor: z = no call, 1 = up, 0 = down
-    floor_call_array: in std_logic_vector(7 downto 0) := (others => 'Z');
+    -- each bit represents a floor: 0 = no call, 1 = up
+    floor_call_array_up: in std_logic_vector(7 downto 0) := (others => '0');
+	 
+	 -- each bit represents a floor: 0 = no call, 1 = down
+    floor_call_array_down: in std_logic_vector(7 downto 0) := (others => '0');
 
     -- buttons pressed inside of elevator
     destination_array: in std_logic_vector(7 downto 0) := (others => '0');
@@ -51,20 +54,20 @@ begin
      -- description: checks if the elevator needs to stop at the current floor
      --     for either a floor call in the same direction of the elevator or
      --     the current floor is a destination floor
-    check_floor_stop: process(clk, i_current_floor, destination_array, floor_call_array, i_direction)
+    check_floor_stop: process(clk, i_current_floor, destination_array, floor_call_array_up, floor_call_array_down, i_direction)
     begin
         if falling_edge(clk) then
             -- check if we are at a destination floor or at floor call floor
             if(destination_array(to_integer(i_current_floor)) = '1' ) then
                 floor_stop <= '1';
             -- elevator in idle and floor call at current_floor
-            elsif(in_idle = '1' and (floor_call_array(to_integer(i_current_floor)) = '1' or floor_call_array(to_integer(i_current_floor)) = '0' )) then
+            elsif(in_idle = '1' and (floor_call_array_up(to_integer(i_current_floor)) = '1' or floor_call_array_down(to_integer(i_current_floor)) = '1' )) then
                 floor_stop <= '1';
             -- check if there is a floor call going up
-            elsif(floor_call_array(to_integer(i_current_floor)) = '1' and i_direction = '1') then
+            elsif(floor_call_array_up(to_integer(i_current_floor)) = '1' and i_direction = '1') then
                 floor_stop <= '1';
             -- check if there is a floor call going down
-            elsif(floor_call_array(to_integer(i_current_floor)) = '0' and i_direction = '0') then
+            elsif(floor_call_array_down(to_integer(i_current_floor)) = '1' and i_direction = '0') then
                 floor_stop <= '1';
             else
                 floor_stop <= '0';
@@ -77,7 +80,7 @@ begin
      --     is heading towards a destination or not
      -- input: 
      -- output: 
-    check_destination_bits: process(clk, destination_array, floor_call_array)
+    check_destination_bits: process(clk, destination_array, floor_call_array_up, floor_call_array_down)
 	variable i: integer := 0;
     begin
     if(rising_edge(clk)) then
@@ -133,7 +136,7 @@ begin
         i := 0;
         floor_call <= '0';
         while i <= 7 loop
-            if(not (floor_call_array(i) = 'Z')) then
+            if(floor_call_array_up(i) = '1' OR floor_call_array_down(i) = '1') then
                 -- there is a floor call above us
                 if(i_current_floor < i) then
                     floor_call <= '1';

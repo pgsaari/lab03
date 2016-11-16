@@ -31,19 +31,22 @@ SIGNAL Hex_Link : std_logic_vector(4 DOWNTO 0) := "00000";
 signal sec_term	 :std_logic := '0';
 
 --USED TO SEND STATE OF MACHINE TO HEX FILE----------
-signal state_of_machine: std_logic_vector(2 downto 0);
+signal state_of_machine: std_logic_vector(2 downto 0) := (others => '0');
 
 ---USED TO SEND CURRENT FLOOR OF ELEVATOR TO HEX FILE
-signal elvator_current_floor: unsigned(3 downto 0);
+signal elvator_current_floor: unsigned(3 downto 0) := (others => '0');
 
 ----USED TO SEND DIRECTION FROM STATE_MACHINE TO FLOOR_CONTROL------
-signal direction_of_elevator: std_logic;
+signal direction_of_elevator: std_logic := '0';
 
 ---USED TO LINK DESTINATION ARRAY FROM FLOOR_CONTROL TO ELEVATOR_STATE
-signal des_array: std_logic_vector(7 downto 0);
+signal des_array: std_logic_vector(7 downto 0) := (others => '0');
 
----USED TO LINK FLOOR CALL ARRAY FROM FLOOR_CONTROL TO ELEVATOR_STATE
-signal floor_array: std_logic_vector(7 downto 0);
+---USED TO LINK FLOOR CALL ARRAY UP FROM FLOOR_CONTROL TO ELEVATOR_STATE
+signal floor_array_up: std_logic_vector(7 downto 0) := (others => '0');
+
+---USED TO LINK FLOOR CALL ARRAY DOWN FROM FLOOR_CONTROL TO ELEVATOR_STATE
+signal floor_array_down: std_logic_vector(7 downto 0) := (others => '0');
 
 	------ seven_seg_display--------- 
 COMPONENT seven_seg is Port(
@@ -73,8 +76,11 @@ component elevator_state is port(
 	 clk: in std_logic;
     term1: in std_logic;
 
-    -- each bit represents a floor: z = no call, 1 = up, 0 = down
-    floor_call_array: in std_logic_vector(7 downto 0) := (others => 'Z');
+   -- each bit represents a floor: 0 = no call, 1 = up
+    floor_call_array_up: in std_logic_vector(7 downto 0) := (others => '0');
+	 
+	 -- each bit represents a floor: 0 = no call, 1 = down
+    floor_call_array_down: in std_logic_vector(7 downto 0) := (others => '0');
 
     -- buttons pressed inside of elevator
     destination_array: in std_logic_vector(7 downto 0);
@@ -100,8 +106,11 @@ component floor_control is port(
 	--Bit '3' downto '0' are used to specify the floor
 	input_array: in std_logic_vector(4 downto 0); 
 	
-    -- each bit represents a floor: z = no call, 1 = up, 0 = down
-    floor_call_array: out std_logic_vector(7 downto 0) := (others => 'Z');
+    -- each bit represents a floor: 1 = up , 0 = no call
+    floor_call_array_up: out std_logic_vector(7 downto 0) := (others => '0');
+	 
+	  -- each bit represents a floor: 1 = down, 0 = no call
+    floor_call_array_down: out std_logic_vector(7 downto 0) := (others => '0');
 
     -- buttons pressed inside of elevator
     destination_array: out std_logic_vector(7 downto 0):= (others => '0')
@@ -140,8 +149,11 @@ state_mach : elevator_state port map(
 	 clk => sec_term,
     term1 => '0',
 
-    -- each bit represents a floor: z = no call, 1 = up, 0 = down
-    floor_call_array => floor_array,
+    -- each bit represents a floor: 1 = up, 0 = no call
+    floor_call_array_up => floor_array_up,
+	 
+	  -- each bit represents a floor: 1 = down, 0 = no call
+    floor_call_array_down => floor_array_down,
 
     -- buttons pressed inside of elevator
     destination_array => des_array,
@@ -167,8 +179,11 @@ f_control : floor_control port map(
 	--Bit '3' downto '0' are used to specify the floor
 	input_array => SW(4 downto 0),
 	
-    -- each bit represents a floor: z = no call, 1 = up, 0 = down
-    floor_call_array => floor_array,
+   -- each bit represents a floor: 1 = up, 0 = no call
+    floor_call_array_up => floor_array_up,
+	 
+	  -- each bit represents a floor: 1 = down, 0 = no call
+    floor_call_array_down => floor_array_down,
 
 	 --state of state machine
 	 state => state_of_machine,

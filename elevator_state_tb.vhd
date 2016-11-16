@@ -14,7 +14,8 @@ architecture stimulus of elevator_state_tb is
         port(
             clk: in std_logic;
             term1: in std_logic;
-            floor_call_array: in std_logic_vector(7 downto 0) := (others => 'Z');
+            floor_call_array_up: in std_logic_vector(7 downto 0) := (others => '0');
+				floor_call_array_down: in std_logic_vector(7 downto 0) := (others => '0');
             destination_array: in std_logic_vector(7 downto 0);
 
             en1: out std_logic; -- timer to stay on a state
@@ -34,8 +35,10 @@ architecture stimulus of elevator_state_tb is
             state: in std_logic_vector(2 downto 0);
             input_array: in std_logic_vector(4 downto 0); 
             
-            -- each bit represents a floor: z = no call, 1 = up, 0 = down
-            floor_call_array: out std_logic_vector(7 downto 0);
+            -- each bit represents a floor: 1 = up, 0 = no call
+            floor_call_array_up: out std_logic_vector(7 downto 0);
+				-- each bit represents a floor: 1 = down, 0 = no call
+            floor_call_array_down: out std_logic_vector(7 downto 0);
             -- buttons pressed inside of elevator
             destination_array: out std_logic_vector(7 downto 0)
         ); 
@@ -64,7 +67,8 @@ architecture stimulus of elevator_state_tb is
     signal term: std_logic := '0';
 
     -- signals for state machine
-    signal floor_call_array: std_logic_vector(7 downto 0)  := (others => 'Z');
+    signal floor_call_array_up: std_logic_vector(7 downto 0)  := (others => '0');
+	 signal floor_call_array_down: std_logic_vector(7 downto 0)  := (others => '0');
     signal destination_array: std_logic_vector(7 downto 0);-- := (others => '0');
     signal direction: std_logic;
     signal current_floor: unsigned(3 downto 0);
@@ -80,7 +84,8 @@ begin
         port map(
             clk => clk,
             term1 => term,
-            floor_call_array => floor_call_array, -- from floor control
+            floor_call_array_up => floor_call_array_up, -- from floor control
+				floor_call_array_down => floor_call_array_down, -- from floor control
             destination_array => destination_array, -- from floor control
             direction => direction, -- to floor control
             current_floor => current_floor, -- to floor control
@@ -95,7 +100,8 @@ begin
             enable => enable, -- from 'board'
             state => state,
             input_array => input_array, -- from 'board'
-            floor_call_array => floor_call_array, -- to state machine
+            floor_call_array_up => floor_call_array_up, -- to state machine
+				floor_call_array_down => floor_call_array_down, -- from floor control
             destination_array => destination_array -- to state machine
         );
 
