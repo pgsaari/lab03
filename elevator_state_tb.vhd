@@ -21,7 +21,7 @@ architecture stimulus of elevator_state_tb is
             en1: out std_logic; -- timer to stay on a state
             direction: out std_logic;
             door: out std_logic; -- 1 for open, 0 for close
-            current_floor: out unsigned(3 downto 0) := (others => '0'); -- 8 floors max
+            current_floor: out std_logic_vector(3 downto 0) := (others => '0'); -- 8 floors max
             state_out: out std_logic_vector(2 downto 0)
        ); 
     end component elevator_state;
@@ -30,7 +30,7 @@ architecture stimulus of elevator_state_tb is
         port(
             clk: in std_logic; -- This is clock
             direction: in std_logic; -- This is direction of elevator
-            current_floor: in unsigned(3 downto 0); -- This is current floor of the elevator
+            current_floor: in std_logic_vector(3 downto 0); -- This is current floor of the elevator
             enable: in std_logic; --Used to tell floor_control when to latch in data
             state: in std_logic_vector(2 downto 0);
             input_array: in std_logic_vector(4 downto 0); 
@@ -71,7 +71,7 @@ architecture stimulus of elevator_state_tb is
 	 signal floor_call_array_down: std_logic_vector(7 downto 0)  := (others => '0');
     signal destination_array: std_logic_vector(7 downto 0);-- := (others => '0');
     signal direction: std_logic;
-    signal current_floor: unsigned(3 downto 0);
+    signal current_floor: std_logic_vector(3 downto 0);
     signal state: std_logic_vector(2 downto 0);
 
     -- signals for floor control
@@ -120,14 +120,14 @@ begin
         -- start off with no floor calls or destinations
         --floor_call_array <= (others => 'Z');
         --destination_array <= (others => '0');
-        wait for 3*CLK_PER;
+        wait for 1*CLK_PER;
 
         -- Test Case 1: Elevator responds to floor call from idle state
         
         input_array <= "01101"; -- floor call going up at floor 5
         wait for 1*CLK_PER;
         enable <= '1';
-        wait for 1*CLK_PER;
+        wait for 3*CLK_PER;
         enable <= '0';
         wait for 25*CLK_PER;
         report "End of Test Case 1" -- 560 ns

@@ -20,14 +20,14 @@ entity elevator_state is port(
     en1: out std_logic; -- timer to stay on a state
     direction: out std_logic;
     door: out std_logic; -- 1 for open, 0 for close
-    current_floor: out unsigned(3 downto 0) := (others => '0'); -- 8 floors max
+    current_floor: out std_logic_vector(3 downto 0) := (others => '0'); -- 8 floors max
     state_out: out std_logic_vector(2 downto 0)
 ); end entity;
 
 architecture logic of elevator_state is
 
     --define state types
-    type state_type is (idle, up, down, loading, floor_change);
+    type state_type is (idle, up, down, loading);
     signal current_state, next_state: state_type;
 
     -- keep track if floor changed or not
@@ -56,7 +56,7 @@ begin
      --     the current floor is a destination floor
     check_floor_stop: process(clk, i_current_floor, destination_array, floor_call_array_up, floor_call_array_down, i_direction)
     begin
-        if falling_edge(clk) then
+        if rising_edge(clk) then
             -- check if we are at a destination floor or at floor call floor
             if(destination_array(to_integer(i_current_floor)) = '1' ) then
                 floor_stop <= '1';
@@ -81,15 +81,13 @@ begin
      -- input: 
      -- output: 
     check_destination_bits: process(clk, destination_array, floor_call_array_up, floor_call_array_down)
-	variable i: integer := 0;
     begin
     if(rising_edge(clk)) then
 --------------------------Set Destination bit-------------------------------------
         destination <= '0';
         -- check for destinations below elevator first
 		if i_direction = '1' Then
-            i := 7;
-			while i >= 0 loop
+			for i in 7 downto 0 loop
                 -- if floor we are checking is a destination floor
 				if(destination_array(i) = '1') then
 					-- there is a destination above us
@@ -98,19 +96,17 @@ begin
 					-- there is a destination below elevator
 					elsif(i_current_floor > i) then
 						destination <= '1';
-                        i_direction <= '0';
+                  i_direction <= '0';
 					-- destination at current floor
 					else
 						destination <= '0';
 					end if;
 				    exit; -- stop looping once we found the floor_call
 				end if;
-				i := i - 1;
 			end loop;
         -- check for destinations above elevator first
 		else -- i_direction = '0'
-            i := 0;
-			while i <= 7 loop
+			for i in 0 to 7 loop
             -- if floor we are checking is a destination floor
             if(destination_array(i) = '1') then
                 -- there is a destination above us
@@ -126,16 +122,14 @@ begin
                 end if;
                 exit; -- stop looping once we found the floor_call
             end if;
-            i := i + 1;
 			end loop;
 		end if;
         
 -----------------End set destination bit--------------------------------------
 
 ----------------Start set floor call bit-----------------------------------
-        i := 0;
         floor_call <= '0';
-        while i <= 7 loop
+        for i in 0 to 7 loop
             if(floor_call_array_up(i) = '1' OR floor_call_array_down(i) = '1') then
                 -- there is a floor call above us
                 if(i_current_floor < i) then
@@ -156,7 +150,6 @@ begin
                 end if;
             exit; -- stop looping once we found the floor_call
             end if;
-            i := i + 1;
         end loop;
     end if;
 -----------------End set floor call bit---------------------------------
@@ -172,7 +165,16 @@ begin
 		end if;
     end process;
     
-
+	--increment/decrement floor
+	process(clk, current_state) begin
+		if falling_edge(clk) Then
+			if(floor_changed = '1' AND current_state = up) then
+				i_current_floor <= i_current_floor +1;
+			elsif (floor_changed = '1' AND current_state = down) Then
+				i_current_floor <= i_current_floor - 1;
+			end if;
+		end if;
+	end process;
 
     -- describe logic for determining next state
     process(floor_call, floor_stop, i_direction, destination, i_current_floor, floor_changed, destination_array)
@@ -199,7 +201,7 @@ begin
                     next_state <= loading;
                 -- otherwise continue up
                 else
-                    next_state <= floor_change;
+                    next_state <= up;
                 end if;
             when down =>
                 -- if there is a floor call or destination stop and load passengers
@@ -207,7 +209,7 @@ begin
                     next_state <= loading;
                 -- otherwise continue down
                 else
-                    next_state <= floor_change;
+                    next_state <= down;
                 end if;
             when loading =>
                 -- still heading to a destination continue down
@@ -220,12 +222,12 @@ begin
                 else
                     next_state <= idle;
                 end if;
-            when floor_change =>
-                if(i_direction = '1') then
-                    next_state <= up;
-                else
-                    next_state <= down;
-                end if;
+          --  when floor_change =>
+           --     if(i_direction = '1') then
+           --         next_state <= up;
+            --    else
+             --       next_state <= down;
+              --  end if;
         end case;
     end process;
 
@@ -234,31 +236,31 @@ begin
     moore: process(current_state)
         begin
         -- Initialize state_out to default values so case only covers when they change
-        door <= '0';
-        state_out <= "000";
-        in_idle <= '0';
-        case current_state is
-            when idle =>
-                in_idle <= '1';
-            when up =>
-                i_current_floor <= i_current_floor + 1;
-                floor_changed <= '1';
-                state_out <= "001";
-                --i_direction <= '1';
-            when down =>
-                i_current_floor <= i_current_floor - 1;
-                floor_changed <= '1';
-                state_out <= "010";
-                --i_direction <= '0';
-            when loading =>
-                state_out <= "011";
-                door <= '1';				
-            when floor_change =>
-                state_out <= "100";
-                floor_changed <= '0';
-        end case;
+			  door <= '0';
+			  state_out <= "000";
+			  in_idle <= '0';
+			  floor_changed <= '0';
+			  case current_state is
+					when idle =>
+						 in_idle <= '1';
+					when up =>
+						 floor_changed <= '1';
+						 state_out <= "001";
+						 --i_current_floor <= i_current_floor + 1;
+						 --i_direction <= '1';
+					when down =>
+						 floor_changed <= '1';
+						 state_out <= "010";
+						 --i_current_floor <= i_current_floor - 1;
+						 --i_direction <= '0';
+					when loading =>
+						 state_out <= "011";
+						 door <= '1';				
+					--when floor_change =>
+					--	 state_out <= "100";
+			  end case;
     end process moore;
 	
-current_floor <= i_current_floor; -- drive floor to output
+current_floor <= std_logic_vector(i_current_floor); -- drive floor to output
 direction <= i_direction; -- drive direction to output
 end architecture logic;

@@ -34,7 +34,7 @@ signal sec_term	 :std_logic := '0';
 signal state_of_machine: std_logic_vector(2 downto 0) := (others => '0');
 
 ---USED TO SEND CURRENT FLOOR OF ELEVATOR TO HEX FILE
-signal elvator_current_floor: unsigned(3 downto 0) := (others => '0');
+signal elvator_current_floor: std_logic_vector(3 downto 0) := (others => '0');
 
 ----USED TO SEND DIRECTION FROM STATE_MACHINE TO FLOOR_CONTROL------
 signal direction_of_elevator: std_logic := '0';
@@ -51,7 +51,7 @@ signal floor_array_down: std_logic_vector(7 downto 0) := (others => '0');
 	------ seven_seg_display--------- 
 COMPONENT seven_seg is Port(
 	state: in std_logic_vector(2 downto 0);
-	floor: in unsigned(3 downto 0);
+	floor: in std_logic_vector(3 downto 0);
 	segs: out	std_logic_vector(6 downto 0)
 ); END COMPONENT;
 
@@ -88,7 +88,7 @@ component elevator_state is port(
     en1: out std_logic; -- timer to stay on a state
     direction: out std_logic;
     door: out std_logic; -- 1 for open, 0 for close
-    current_floor: out unsigned(3 downto 0) := (others => '0'); -- 8 floors max
+    current_floor: out std_logic_vector(3 downto 0) := (others => '0'); -- 8 floors max
     state_out: out std_logic_vector(2 downto 0)
 );end component;
 	
@@ -96,7 +96,7 @@ component elevator_state is port(
 component floor_control is port(
    clk: in std_logic; -- This is clock
 	direction: in std_logic; -- This is direction of elevator
-	current_floor: in unsigned(3 downto 0); -- This is current floor of the elevator
+	current_floor: in std_logic_vector(3 downto 0); -- This is current floor of the elevator
 	enable: in std_logic; --Used to tell floor_control when to latch in data
 	state: in std_logic_vector( 2 downto 0); -- state of state machine
 	

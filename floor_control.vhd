@@ -6,7 +6,7 @@ use ieee.std_logic_unsigned.all;
 entity floor_control is port(
    clk: in std_logic; -- This is clock
 	direction: in std_logic; -- This is direction of elevator
-	current_floor: in unsigned(3 downto 0); -- This is current floor of the elevator
+	current_floor: in std_logic_vector(3 downto 0); -- This is current floor of the elevator
 	enable: in std_logic; --Used to tell floor_control when to latch in data
 	state: in std_logic_vector(2 downto 0);
 	
@@ -43,7 +43,7 @@ BEGIN
 --'1' There is a floor call at specified floor(index) to go "UP" if "UP" array or "DOWN" if "DOWN" array
 --'0' There is no current floor_call at specified floor(index)
 floor: process(clk, current_floor, enable) begin
-	if(falling_edge(clk)) then
+	if(rising_edge(clk)) then
 		if enable = '1' then
 			if which_array = '0' Then
 				if which_direction = '0' Then
@@ -56,24 +56,24 @@ floor: process(clk, current_floor, enable) begin
 			end if;		
 		end if;
 
-		if i_destination_array(to_integer(current_floor)) = '1' Then
-			i_destination_array(to_integer(current_floor)) <= '0';
+		if i_destination_array(to_integer(unsigned(current_floor))) = '1' Then
+			i_destination_array(to_integer(unsigned(current_floor))) <= '0';
 		end if;
 
-		if (state = "000" and (i_floor_call_array_up(to_integer(current_floor)) = '1')) then
-			i_floor_call_array_up(to_integer(current_floor)) <= '0';
+		if (state = "000" and (i_floor_call_array_up(to_integer(unsigned(current_floor))) = '1')) then
+			i_floor_call_array_up(to_integer(unsigned(current_floor))) <= '0';
 		end if;
 		
-		if (state = "000" and (i_floor_call_array_down(to_integer(current_floor)) = '1')) then
-			i_floor_call_array_down(to_integer(current_floor)) <= '0';
+		if (state = "000" and (i_floor_call_array_down(to_integer(unsigned(current_floor))) = '1')) then
+			i_floor_call_array_down(to_integer(unsigned(current_floor))) <= '0';
 		end if;
 
-		if direction = '1' AND i_floor_call_array_up(to_integer(current_floor)) = '1' Then
-			i_floor_call_array_up(to_integer(current_floor)) <= '0';
+		if direction = '1' AND i_floor_call_array_up(to_integer(unsigned(current_floor))) = '1' Then
+			i_floor_call_array_up(to_integer(unsigned(current_floor))) <= '0';
 		end if;
 		
-		if direction = '0' AND i_floor_call_array_down(to_integer(current_floor)) = '1' Then
-			i_floor_call_array_down(to_integer(current_floor)) <= '0';
+		if direction = '0' AND i_floor_call_array_down(to_integer(unsigned(current_floor))) = '1' Then
+			i_floor_call_array_down(to_integer(unsigned(current_floor))) <= '0';
 		end if;
 	end if;
 end process;

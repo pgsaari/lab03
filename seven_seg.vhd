@@ -7,7 +7,7 @@ USE ieee.numeric_std.all;
 entity seven_seg is
 port(
 	state: in std_logic_vector(2 downto 0);
-	floor: in unsigned(3 downto 0);
+	floor: in std_logic_vector(3 downto 0);
 
 	segs: out	std_logic_vector(6 downto 0)
 	);
@@ -56,7 +56,7 @@ architecture rtl of seven_seg is
 			segs(6) <= '1';							
 		elsif(state = "100") then -- floor change state
 			-- display current floor
-			case floor is
+			case unsigned(floor) is
 				when "0000" => -- 0
 					segs(0) <= '0';
 					segs(1) <= '0';
