@@ -17,7 +17,7 @@ entity elevator_top is Port(
 	KEY		:in		std_logic;	--Pushbutton TO LATCH IN DATA
 	
 	--////////////////////////	DPDT Switch		////////////////////////
-	--0-3: SPECIFY FLOOR, 4: DIRECTION (UP(1), DOWN(0)), 5: FLOOR CALL(0) OR DESTINATION CALL(1)
+	--0-2: SPECIFY FLOOR, 3: DIRECTION (UP(1), DOWN(0)), 4: FLOOR CALL(0) OR DESTINATION CALL(1)
 	SW			:in		std_logic_vector(4 downto 0) -- 
 	
 ); end entity elevator_top;
@@ -101,9 +101,9 @@ component floor_control is port(
 	state: in std_logic_vector( 2 downto 0); -- state of state machine
 	
 	-- This is the input from top level which essentialy comes from board switches
-	--Bit '5' specifies which array to write to
-	--Bit '4' specifies what direction to specify when writing to array
-	--Bit '3' downto '0' are used to specify the floor
+	--Bit '4' specifies which array to write to
+	--Bit '3' specifies what direction to specify when writing to array
+	--Bit '2' downto '0' are used to specify the floor
 	input_array: in std_logic_vector(4 downto 0); 
 	
     -- each bit represents a floor: 1 = up , 0 = no call
@@ -171,12 +171,12 @@ f_control : floor_control port map(
    clk => sec_term, -- This is clock
 	direction => direction_of_elevator, -- This is direction of elevator
 	current_floor => elvator_current_floor, -- This is current floor of the elevator
-	enable => KEY, --Used to tell floor_control when to latch in data
+	enable => (not(KEY)), --Used to tell floor_control when to latch in data
 	
 	-- This is the input from top level which essentialy comes from board switches
-	--Bit '5' specifies which array to write to
-	--Bit '4' specifies what direction to specify when writing to array
-	--Bit '3' downto '0' are used to specify the floor
+	--Bit '4' specifies which array to write to
+	--Bit '3' specifies what direction to specify when writing to array
+	--Bit '2' downto '0' are used to specify the floor
 	input_array => SW(4 downto 0),
 	
    -- each bit represents a floor: 1 = up, 0 = no call

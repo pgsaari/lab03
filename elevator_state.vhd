@@ -54,7 +54,7 @@ begin
      -- description: checks if the elevator needs to stop at the current floor
      --     for either a floor call in the same direction of the elevator or
      --     the current floor is a destination floor
-    check_floor_stop: process(clk, i_current_floor, destination_array, floor_call_array_up, floor_call_array_down, i_direction)
+    check_floor_stop: process(clk, i_current_floor, destination_array, floor_call_array_up, floor_call_array_down, i_direction, destination)
     begin
         if rising_edge(clk) then
             -- check if we are at a destination floor or at floor call floor
@@ -63,11 +63,17 @@ begin
             -- elevator in idle and floor call at current_floor
             elsif(in_idle = '1' and (floor_call_array_up(to_integer(i_current_floor)) = '1' or floor_call_array_down(to_integer(i_current_floor)) = '1' )) then
                 floor_stop <= '1';
-            -- check if there is a floor call going up
-            elsif(floor_call_array_up(to_integer(i_current_floor)) = '1' and i_direction = '1') then
+            -- check if there is a floor call going up and heading towards a destination
+            elsif(destination = '1' AND floor_call_array_up(to_integer(i_current_floor)) = '1' and i_direction = '1') then
                 floor_stop <= '1';
-            -- check if there is a floor call going down
-            elsif(floor_call_array_down(to_integer(i_current_floor)) = '1' and i_direction = '0') then
+            -- check if there is a floor call going down and heading towards a destination
+            elsif(destination = '1' AND floor_call_array_down(to_integer(i_current_floor)) = '1' and i_direction = '0') then
+                floor_stop <= '1';
+				-- check if there is a floor call and there is no destination
+				elsif(destination = '0' AND floor_call_array_up(to_integer(i_current_floor)) = '1') then
+                floor_stop <= '1';
+            -- check if there is a floor call and there is no destination
+            elsif(destination = '0' AND floor_call_array_down(to_integer(i_current_floor)) = '1') then
                 floor_stop <= '1';
             else
                 floor_stop <= '0';
