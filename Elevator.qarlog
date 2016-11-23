@@ -1,19 +1,19 @@
-Quartus Prime Archive log --	C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/Elevator.qarlog
+Quartus Prime Archive log --	C:/Users/Paul/Documents/Homework/Digital_Logic_Lab/lab_03/Elevator.qarlog
 
-Archive:	C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/Elevator.qar
-Date:		Wed Nov 16 20:15:33 2016
+Archive:	C:/Users/Paul/Documents/Homework/Digital_Logic_Lab/lab_03/Elevator.qar
+Date:		Tue Nov 22 21:22:28 2016
 Quartus Prime		16.0.0 Build 211 04/27/2016 SJ Lite Edition
 
 	=========== Files Selected: ===========
-C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/Elevator.qpf
-C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/Elevator.qsf
-C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/elevator_state.vhd
-C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/elevator_state_tb.vhd
-C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/elevator_top.vhd
-C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/floor_control.vhd
-C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/gen_counter.vhd
-C:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR/seven_seg.vhd
-c:/users/ricardo/documents/altera/quartus/bin64/assignment_defaults.qdf
+C:/Users/Paul/Documents/Homework/Digital_Logic_Lab/lab_03/Elevator.qpf
+C:/Users/Paul/Documents/Homework/Digital_Logic_Lab/lab_03/Elevator.qsf
+C:/Users/Paul/Documents/Homework/Digital_Logic_Lab/lab_03/elevator_state.vhd
+C:/Users/Paul/Documents/Homework/Digital_Logic_Lab/lab_03/elevator_state_tb.vhd
+C:/Users/Paul/Documents/Homework/Digital_Logic_Lab/lab_03/elevator_top.vhd
+C:/Users/Paul/Documents/Homework/Digital_Logic_Lab/lab_03/floor_control.vhd
+C:/Users/Paul/Documents/Homework/Digital_Logic_Lab/lab_03/gen_counter.vhd
+C:/Users/Paul/Documents/Homework/Digital_Logic_Lab/lab_03/seven_seg.vhd
+c:/altera_lite/16.0/quartus/bin64/assignment_defaults.qdf
 	======= Total: 9 files to archive =======
 
 	================ Status: ===============
