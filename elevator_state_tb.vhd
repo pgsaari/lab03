@@ -11,14 +11,16 @@ architecture stimulus of elevator_state_tb is
     constant CLK_PER: time := 20 ns; -- clock period
 
     component elevator_state is 
+		  generic (
+				num_floors: positive -- states how many floors
+		  );
         port(
             clk: in std_logic;
-            term1: in std_logic;
-            floor_call_array_up: in std_logic_vector(7 downto 0) := (others => '0');
-				floor_call_array_down: in std_logic_vector(7 downto 0) := (others => '0');
-            destination_array: in std_logic_vector(7 downto 0);
+           
+            floor_call_array_up: in std_logic_vector(num_floors-1 downto 0) := (others => '0');
+				floor_call_array_down: in std_logic_vector(num_floors-1 downto 0) := (others => '0');
+            destination_array: in std_logic_vector(num_floors-1 downto 0);
 
-            en1: out std_logic; -- timer to stay on a state
             direction: out std_logic;
             door: out std_logic; -- 1 for open, 0 for close
             current_floor: out std_logic_vector(3 downto 0) := (others => '0'); -- 8 floors max
@@ -27,20 +29,23 @@ architecture stimulus of elevator_state_tb is
     end component elevator_state;
 
     component floor_control is 
+		  generic (
+				num_floors: positive -- states how many floors
+		  );
         port(
             clk: in std_logic; -- This is clock
             direction: in std_logic; -- This is direction of elevator
             current_floor: in std_logic_vector(3 downto 0); -- This is current floor of the elevator
             enable: in std_logic; --Used to tell floor_control when to latch in data
             state: in std_logic_vector(2 downto 0);
-            input_array: in std_logic_vector(4 downto 0); 
+            input_array: in std_logic_vector(5 downto 0); 
             
             -- each bit represents a floor: 1 = up, 0 = no call
-            floor_call_array_up: out std_logic_vector(7 downto 0);
+            floor_call_array_up: out std_logic_vector(num_floors-1 downto 0);
 				-- each bit represents a floor: 1 = down, 0 = no call
-            floor_call_array_down: out std_logic_vector(7 downto 0);
+            floor_call_array_down: out std_logic_vector(num_floors-1 downto 0);
             -- buttons pressed inside of elevator
-            destination_array: out std_logic_vector(7 downto 0)
+            destination_array: out std_logic_vector(num_floors-1 downto 0)
         ); 
     end component;
 
@@ -61,29 +66,33 @@ architecture stimulus of elevator_state_tb is
 		    term	:out std_logic -- maximum count is reached
 		);
     end component gen_counter;
-
+	 
+	 CONSTANT number_floors: INTEGER := 16;
+	
     -- clock signal
     signal clk: std_logic;
-    signal term: std_logic := '0';
 
     -- signals for state machine
-    signal floor_call_array_up: std_logic_vector(7 downto 0)  := (others => '0');
-	 signal floor_call_array_down: std_logic_vector(7 downto 0)  := (others => '0');
-    signal destination_array: std_logic_vector(7 downto 0);-- := (others => '0');
+    signal floor_call_array_up: std_logic_vector(number_floors-1 downto 0)  := (others => '0');
+	 signal floor_call_array_down: std_logic_vector(number_floors-1 downto 0)  := (others => '0');
+    signal destination_array: std_logic_vector(number_floors-1 downto 0);-- := (others => '0');
     signal direction: std_logic;
     signal current_floor: std_logic_vector(3 downto 0);
     signal state: std_logic_vector(2 downto 0);
+	 
 
     -- signals for floor control
     signal enable: std_logic;
-    signal input_array: std_logic_vector(4 downto 0);
+    signal input_array: std_logic_vector(5 downto 0);
 
 begin
 
     elevator_state1: elevator_state
+		  generic map(
+				num_floors => number_floors
+		  ) 
         port map(
             clk => clk,
-            term1 => term,
             floor_call_array_up => floor_call_array_up, -- from floor control
 				floor_call_array_down => floor_call_array_down, -- from floor control
             destination_array => destination_array, -- from floor control
@@ -93,6 +102,9 @@ begin
         );
 
     floor_control1: floor_control
+		  generic map(
+				num_floors => number_floors
+        ) 
         port map(
             clk => clk,
             direction => direction, -- from state machine

@@ -3,24 +3,25 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.std_logic_unsigned.all;
 
-entity elevator_state is port(
+entity elevator_state is 
+generic (
+		num_floors: positive -- states how many floors
+);
+port(
     clk: in std_logic;
-    term1: in std_logic;
 
     -- each bit represents a floor: 0 = no call, 1 = up
-    floor_call_array_up: in std_logic_vector(7 downto 0) := (others => '0');
+    floor_call_array_up: in std_logic_vector(num_floors-1 downto 0) := (others => '0');
 	 
 	 -- each bit represents a floor: 0 = no call, 1 = down
-    floor_call_array_down: in std_logic_vector(7 downto 0) := (others => '0');
+    floor_call_array_down: in std_logic_vector(num_floors-1 downto 0) := (others => '0');
 
     -- buttons pressed inside of elevator
-    destination_array: in std_logic_vector(7 downto 0) := (others => '0');
+    destination_array: in std_logic_vector(num_floors-1 downto 0) := (others => '0');
 
-
-    en1: out std_logic; -- timer to stay on a state
     direction: out std_logic;
     door: out std_logic; -- 1 for open, 0 for close
-    current_floor: out std_logic_vector(3 downto 0) := (others => '0'); -- 8 floors max
+    current_floor: out std_logic_vector(3 downto 0) := (others => '0'); -- 16 floors max
     state_out: out std_logic_vector(2 downto 0)
 ); end entity;
 
@@ -93,7 +94,7 @@ begin
         destination <= '0';
         -- check for destinations below elevator first
 		if i_direction = '1' Then
-			for i in 7 downto 0 loop
+			for i in num_floors-1 downto 0 loop
                 -- if floor we are checking is a destination floor
 				if(destination_array(i) = '1') then
 					-- there is a destination above us
@@ -112,7 +113,7 @@ begin
 			end loop;
         -- check for destinations above elevator first
 		else -- i_direction = '0'
-			for i in 0 to 7 loop
+			for i in 0 to num_floors-1 loop
             -- if floor we are checking is a destination floor
             if(destination_array(i) = '1') then
                 -- there is a destination above us
@@ -135,7 +136,7 @@ begin
 
 ----------------Start set floor call bit-----------------------------------
         floor_call <= '0';
-        for i in 0 to 7 loop
+        for i in 0 to num_floors-1 loop
             if(floor_call_array_up(i) = '1' OR floor_call_array_down(i) = '1') then
                 -- there is a floor call above us
                 if(i_current_floor < i) then
@@ -228,17 +229,10 @@ begin
                 else
                     next_state <= idle;
                 end if;
-          --  when floor_change =>
-           --     if(i_direction = '1') then
-           --         next_state <= up;
-            --    else
-             --       next_state <= down;
-              --  end if;
         end case;
     end process;
 
     -- describe outputs of the fsm
-    --moore: process(current_state, floor_call_array, i_current_floor, i_direction)
     moore: process(current_state)
         begin
         -- Initialize state_out to default values so case only covers when they change
@@ -252,18 +246,12 @@ begin
 					when up =>
 						 floor_changed <= '1';
 						 state_out <= "001";
-						 --i_current_floor <= i_current_floor + 1;
-						 --i_direction <= '1';
 					when down =>
 						 floor_changed <= '1';
 						 state_out <= "010";
-						 --i_current_floor <= i_current_floor - 1;
-						 --i_direction <= '0';
 					when loading =>
 						 state_out <= "011";
 						 door <= '1';				
-					--when floor_change =>
-					--	 state_out <= "100";
 			  end case;
     end process moore;
 	
