@@ -27,24 +27,6 @@ architecture rtl of seven_seg is
 			segs(4) <= '1';
 			segs(5) <= '1';
 			segs(6) <= '0';	
-		--elsif(state = "001") then -- up state
-			---- display an up arrow, kinda...
-			--segs(0) <= '0';
-			--segs(1) <= '0';
-			--segs(2) <= '1';
-			--segs(3) <= '1';
-			--segs(4) <= '0';
-			--segs(5) <= '0';
-			--segs(6) <= '1';	
-		--elsif(state = "010") then -- down state
-			-- display a down arrow
-			--segs(0) <= '1';
-			--segs(1) <= '0';
-			--segs(2) <= '0';
-			--segs(3) <= '0';
-			--segs(4) <= '0';
-			--segs(5) <= '1';
-			--segs(6) <= '1';	
 		elsif(state = "011") then -- loading state
 			-- display an 'L'
 			segs(0) <= '1';
@@ -112,7 +94,7 @@ architecture rtl of seven_seg is
 					segs(6) <= '0'; 
 					
 				when "0110" => -- 6
-					segs(0) <= '1'; 
+					segs(0) <= '0'; 
 					segs(1) <= '1';
 					segs(2) <= '0'; 
 					segs(3) <= '0';
@@ -146,24 +128,79 @@ architecture rtl of seven_seg is
 					segs(4) <= '1';
 					segs(5) <= '0';
 					segs(6) <= '0';
-				when others => --others
+
+				when "1010" => -- 10 or 'A'
+					segs(0) <= '0';
+					segs(1) <= '0';
+					segs(2) <= '0';
+					segs(3) <= '1';
+					segs(4) <= '0';
+					segs(5) <= '0';
+					segs(6) <= '0';
+
+				when "1011" => -- 11 or 'b'
+					segs(0) <= '1';
+					segs(1) <= '1';
+					segs(2) <= '0';
+					segs(3) <= '0';
+					segs(4) <= '0';
+					segs(5) <= '0';
+					segs(6) <= '0';
+
+				when "1100" => -- 12 or 'c'
+					segs(0) <= '1';
+					segs(1) <= '1';
+					segs(2) <= '1';
+					segs(3) <= '0';
+					segs(4) <= '0';
+					segs(5) <= '1';
+					segs(6) <= '0';
+
+				when "1101" => -- 13 or 'd'
+					segs(0) <= '1';
+					segs(1) <= '0';
+					segs(2) <= '0';
+					segs(3) <= '0';
+					segs(4) <= '0';
+					segs(5) <= '1';
+					segs(6) <= '0';
+
+				when "1110" => -- 14 or 'E'
+					segs(0) <= '0';
+					segs(1) <= '1';
+					segs(2) <= '1';
+					segs(3) <= '0';
+					segs(4) <= '0';
+					segs(5) <= '0';
+					segs(6) <= '0';	
+
+				when "1111" => -- 15 or 'F'
+					segs(0) <= '0';
+					segs(1) <= '1';
+					segs(2) <= '1';
+					segs(3) <= '1';
+					segs(4) <= '0';
+					segs(5) <= '0';
+					segs(6) <= '0';	
+
+				when others => --others display nothing
 					segs(0) <= '1';
 					segs(1) <= '1';
 					segs(2) <= '1';
 					segs(3) <= '1';
 					segs(4) <= '1';
 					segs(5) <= '1';
-					segs(6) <= '0';
+					segs(6) <= '1';
 			end case;
 
 		else -- error
-			-- display an E
+			-- display a three horizontal lines
 			segs(0) <= '0';
 			segs(1) <= '1';
 			segs(2) <= '1';
 			segs(3) <= '0';
-			segs(4) <= '0';
-			segs(5) <= '0';
+			segs(4) <= '1';
+			segs(5) <= '1';
 			segs(6) <= '0';	
 		end if;
 	end process seven_seg;
