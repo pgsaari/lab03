@@ -16,7 +16,7 @@ architecture stimulus of elevator_state_tb is
 		  );
         port(
             clk: in std_logic;
-           
+            
             floor_call_array_up: in std_logic_vector(num_floors-1 downto 0) := (others => '0');
 				floor_call_array_down: in std_logic_vector(num_floors-1 downto 0) := (others => '0');
             destination_array: in std_logic_vector(num_floors-1 downto 0);
@@ -34,6 +34,7 @@ architecture stimulus of elevator_state_tb is
 		  );
         port(
             clk: in std_logic; -- This is clock
+				input_clock : in std_logic; -- This is 50Mhz clock for input
             direction: in std_logic; -- This is direction of elevator
             current_floor: in std_logic_vector(3 downto 0); -- This is current floor of the elevator
             enable: in std_logic; --Used to tell floor_control when to latch in data
@@ -71,6 +72,7 @@ architecture stimulus of elevator_state_tb is
 	
     -- clock signal
     signal clk: std_logic;
+	 signal input_clk: std_logic;
 
     -- signals for state machine
     signal floor_call_array_up: std_logic_vector(number_floors-1 downto 0)  := (others => '0');
@@ -107,6 +109,7 @@ begin
         ) 
         port map(
             clk => clk,
+				input_clock => input_clk,
             direction => direction, -- from state machine
             current_floor => current_floor, -- from state machine
             enable => enable, -- from 'board'
@@ -121,10 +124,20 @@ begin
     clk_proc: process
     	begin
 		    clk <= '0';
-		    wait for CLK_PER;
+		    wait for CLK_PER * 3;
 		    clk <= '1';
-		    wait for CLK_PER;
+		    wait for CLK_PER * 3;
 	    end process clk_proc;
+----------------------------------------------------
+
+------------clock process--------------------------
+    input_clk_proc: process
+    	begin
+		    input_clk <= '0';
+		    wait for CLK_PER;
+		    input_clk <= '1';
+		    wait for CLK_PER;
+	    end process input_clk_proc;
 ----------------------------------------------------
 
     vectors: process begin
@@ -136,7 +149,7 @@ begin
 
         -- Test Case 1: Elevator responds to floor call from idle state
         
-        input_array <= "01101"; -- floor call going up at floor 5
+        input_array <= "010101"; -- floor call going up at floor 5
         wait for 1*CLK_PER;
         enable <= '1';
         wait for 3*CLK_PER;
@@ -146,7 +159,7 @@ begin
 		severity WARNING;
 
         -- Test Case 2: Elevator takes pasenger to their destination
-        input_array <= "10010"; -- destination on 2nd floor
+        input_array <= "100010"; -- destination on 2nd floor
         wait for 1*CLK_PER;
         enable <= '1';
         wait for 2*CLK_PER;
@@ -155,30 +168,12 @@ begin
         report "End of Test Case 2" -- 1140 ns
 		severity WARNING;
 
-        input_array <= "01010"; -- floor call at floor 2
+        input_array <= "010010"; -- floor call at floor 2
         wait for 1*CLK_PER;
         enable <= '1';
         wait for 2*CLK_PER;
         enable <= '0';
         wait for 24*CLK_PER;
-
-        -- floor_call_array <= "ZZZZZZZ1";
-        -- destination_array <= "00100000";
-        -- wait for 4*CLK_PER;
-        -- floor_call_array <= "ZZZZZZZZ";
-        -- wait for 5*CLK_PER;
-        -- floor_call_array <= "ZZZZ1ZZZ";
-        -- destination_array <= "01100000";
-        -- wait for 9*CLK_PER;
-        -- floor_call_array <= "ZZZZZZZZ";
-        -- wait for 12*CLK_PER;
-        -- destination_array <= "01000000";
-        -- wait for 8*CLK_PER;
-        -- destination_array <= "00000000";
-        -- wait for 5*CLK_PER;
-        -- report "End of Test Case 2" -- 2000 ns
-		-- severity WARNING;
-
 
         report "End of simulation"
         severity FAILURE;

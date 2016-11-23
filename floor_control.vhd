@@ -9,6 +9,7 @@ generic (
 );
 port(
    clk: in std_logic; -- This is clock
+	input_clock : in std_logic; -- This is 50Mhz clock for input
 	direction: in std_logic; -- This is direction of elevator
 	current_floor: in std_logic_vector(3 downto 0); -- This is current floor of the elevator(Max amount of floors is 15)
 	enable: in std_logic; --Used to tell floor_control when to latch in data
@@ -46,8 +47,8 @@ BEGIN
 --This will add and remove remove floor calls whithin i_floor_call_array_up and i_floor_call_array_down
 --'1' There is a floor call at specified floor(index) to go "UP" if "UP" array or "DOWN" if "DOWN" array
 --'0' There is no current floor_call at specified floor(index)
-floor: process(clk, current_floor, enable) begin
-	if(rising_edge(clk)) then
+floor: process(clk, current_floor, enable, input_clock) begin
+	if(rising_edge(input_clock)) then
 		if enable = '1' then
 			if which_array = '0' Then
 				if which_direction = '0' Then
@@ -59,7 +60,8 @@ floor: process(clk, current_floor, enable) begin
 				i_destination_array(to_integer(which_floor)) <= '1';
 			end if;		
 		end if;
-
+	
+	if (clk = '1') then
 		if i_destination_array(to_integer(unsigned(current_floor))) = '1' Then
 			i_destination_array(to_integer(unsigned(current_floor))) <= '0';
 		end if;
@@ -79,6 +81,7 @@ floor: process(clk, current_floor, enable) begin
 		if direction = '0' AND i_floor_call_array_down(to_integer(unsigned(current_floor))) = '1' Then
 			i_floor_call_array_down(to_integer(unsigned(current_floor))) <= '0';
 		end if;
+	end if;
 	end if;
 end process;
 

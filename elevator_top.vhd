@@ -104,6 +104,7 @@ generic (
 );
 port(
    clk: in std_logic; -- This is clock
+	input_clock: in std_logic; -- 50mhz for input
 	direction: in std_logic; -- This is direction of elevator
 	current_floor: in std_logic_vector(3 downto 0); -- This is current floor of the elevator
 	enable: in std_logic; --Used to tell floor_control when to latch in data
@@ -184,6 +185,7 @@ generic map(
 ) 
 port map(
    clk => sec_term, -- This is clock
+	input_clock => CLOCK_50,
 	direction => direction_of_elevator, -- This is direction of elevator
 	current_floor => elvator_current_floor, -- This is current floor of the elevator
 	enable => (not(KEY)), --Used to tell floor_control when to latch in data
