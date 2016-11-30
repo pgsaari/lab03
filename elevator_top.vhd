@@ -11,7 +11,8 @@ entity elevator_top is Port(
    CLOCK_50	:in		std_logic;						-- 50 MHz
 	
 	--////////////////////////	7-SEG Dispaly	///////////////////////////
-	HEX0		:out	std_logic_vector( 6 downto 0);	-- DISPLAY STATUS OF ELVATOR NUMBER 0
+	---------TIE ELEVATOR state to hex display variable----------
+   Hex_Link :out std_logic_vector(42 DOWNTO 0) := (others => '1');
 	
 	-- ///////////////////////Push Buttons(Reset-Write)//////////////////////
 	KEY		:in		std_logic;	--Pushbutton TO LATCH IN DATA
@@ -24,32 +25,38 @@ entity elevator_top is Port(
 
 architecture struct of elevator_top is
 
+--------USED TO SET THE NUMBER OF ELEVATORS------------------
+CONSTANT num_elevators : INTEGER:= 6;
+
 --------USED TO SET THE NUMBER OF FLOORS IN BOTH STATE MACHINES------------------
-CONSTANT number_floors : INTEGER:= 16;
-	
----------TIE ELEVATOR state to hex display variable----------
-SIGNAL Hex_Link : std_logic_vector(4 DOWNTO 0) := "00000";
+CONSTANT number_floors : INTEGER:= 2;
 
 ---USED to link 1 sec counter tem and clock of devices to simulate 1 sec counter-----
 signal sec_term	 :std_logic := '0';
 
+--USED TO SEND INPUT ARRAY TO ALL ELEVATORS----------
+signal input_Array: std_logic_vector(5 downto 0) := (others => '0');
+
 --USED TO SEND STATE OF MACHINE TO HEX FILE----------
-signal state_of_machine: std_logic_vector(2 downto 0) := (others => '0');
+signal state_of_machine: std_logic_vector(3*num_elevators-1 downto 0) := (others => '0');
 
 ---USED TO SEND CURRENT FLOOR OF ELEVATOR TO HEX FILE
-signal elvator_current_floor: std_logic_vector(3 downto 0) := (others => '0');
+signal elvator_current_floor: std_logic_vector(4*num_elevators-1 downto 0) := (others => '0');
 
 ----USED TO SEND DIRECTION FROM STATE_MACHINE TO FLOOR_CONTROL------
-signal direction_of_elevator: std_logic := '0';
+signal direction_of_elevator: std_logic_vector(num_elevators-1 downto 0) := (others => '0');
+
+----USED TO CONTROL ENABLE OF FLOOR_CONTROL------
+signal floor_control_enable: std_logic_vector(num_elevators-1 downto 0) := (others => '0');
 
 ---USED TO LINK DESTINATION ARRAY FROM FLOOR_CONTROL TO ELEVATOR_STATE
-signal des_array: std_logic_vector(number_floors-1 downto 0) := (others => '0');
+signal des_array: std_logic_vector((number_floors)*num_elevators-1 downto 0) := (others => '0');
 
 ---USED TO LINK FLOOR CALL ARRAY UP FROM FLOOR_CONTROL TO ELEVATOR_STATE
-signal floor_array_up: std_logic_vector(number_floors-1 downto 0) := (others => '0');
+signal floor_array_up: std_logic_vector((number_floors)*num_elevators-1 downto 0) := (others => '0');
 
 ---USED TO LINK FLOOR CALL ARRAY DOWN FROM FLOOR_CONTROL TO ELEVATOR_STATE
-signal floor_array_down: std_logic_vector(number_floors-1 downto 0) := (others => '0');
+signal floor_array_down: std_logic_vector((number_floors)*num_elevators-1 downto 0) := (others => '0');
 
 	------ seven_seg_display--------- 
 COMPONENT seven_seg is Port(
@@ -132,11 +139,15 @@ begin
 	-- hook em up here
 
 	--//////////// LCD /////////////////////--
+Gen_seven_seg: for i in 1 to num_elevators generate
+
 hexF : seven_seg port map (
-		state => state_of_machine,
-		floor => elvator_current_floor,
-		segs(6 downto 0) => HEX0
+		state => state_of_machine((3+(i-1)*3)-1 downto 3*(i-1)),
+		floor => elvator_current_floor((4+(i-1)*4)-1 downto 4*(i-1)),
+		segs(6 downto 0) => Hex_Link((7+(i-1)*7)-1 downto 7*(i-1))
 );
+
+end generate Gen_seven_seg;
 	
 	--//////// 1 SEC COUNTER ///////////////--
 count1 : gen_counter generic map(
@@ -155,6 +166,8 @@ port map(
 
 	
 --//////////////STATE MACHINE/////////////--
+Gen_state_mach: for i in 1 to num_elevators generate
+
 state_mach : elevator_state 
 generic map(
 		num_floors => number_floors
@@ -163,22 +176,26 @@ port map(
 	 clk => sec_term,
 
     -- each bit represents a floor: 1 = up, 0 = no call
-    floor_call_array_up => floor_array_up,
+    floor_call_array_up => floor_array_up(((number_floors)+(i-1)*(number_floors))-1 downto (number_floors)*(i-1)),
 	 
 	  -- each bit represents a floor: 1 = down, 0 = no call
-    floor_call_array_down => floor_array_down,
+    floor_call_array_down => floor_array_down(((number_floors)+(i-1)*(number_floors))-1 downto (number_floors)*(i-1)),
 
     -- buttons pressed inside of elevator
-    destination_array => des_array,
+    destination_array => des_array(((number_floors)+(i-1)*(number_floors))-1 downto (number_floors)*(i-1)),
 
-    direction => direction_of_elevator,
+    direction => direction_of_elevator(i-1),
     door => open, -- 1 for open, 0 for close
-    current_floor =>elvator_current_floor, -- 8 floors max
+    current_floor =>elvator_current_floor((4+(i-1)*4)-1 downto 4*(i-1)), -- 16 floors max
 
-	 state_out => state_of_machine
+	 state_out => state_of_machine((3+(i-1)*3)-1 downto 3*(i-1))
 );
 
+end generate Gen_state_mach;
+
 --//////////////////FLOOR CONTROL////////////--
+Gen_floor_control: for i in 1 to num_elevators generate
+
 f_control : floor_control 
 generic map(
 		num_floors =>number_floors
@@ -186,27 +203,29 @@ generic map(
 port map(
    clk => sec_term, -- This is clock
 	input_clock => CLOCK_50,
-	direction => direction_of_elevator, -- This is direction of elevator
-	current_floor => elvator_current_floor, -- This is current floor of the elevator
-	enable => (not(KEY)), --Used to tell floor_control when to latch in data
+	direction => direction_of_elevator(i-1), -- This is direction of elevator
+	current_floor => elvator_current_floor((4+(i-1)*4)-1 downto 4*(i-1)), -- This is current floor of the elevator
+	enable => floor_control_enable(i-1), --Used to tell floor_control when to latch in data
 	
 	-- This is the input from top level which essentialy comes from board switches
 	--Bit '4' specifies which array to write to
 	--Bit '3' specifies what direction to specify when writing to array
 	--Bit '2' downto '0' are used to specify the floor
-	input_array => SW(5 downto 0),
+	input_array => input_Array,
 	
    -- each bit represents a floor: 1 = up, 0 = no call
-    floor_call_array_up => floor_array_up,
+    floor_call_array_up => floor_array_up(((number_floors)+(i-1)*(number_floors))-1 downto (number_floors)*(i-1)),
 	 
 	  -- each bit represents a floor: 1 = down, 0 = no call
-    floor_call_array_down => floor_array_down,
+    floor_call_array_down => floor_array_down(((number_floors)+(i-1)*(number_floors))-1 downto (number_floors)*(i-1)),
 
 	 --state of state machine
-	 state => state_of_machine,
+	 state => state_of_machine((3+(i-1)*3)-1 downto 3*(i-1)),
 	 
     -- buttons pressed inside of elevator
-    destination_array => des_array
+    destination_array => des_array(((number_floors)+(i-1)*(number_floors))-1 downto (number_floors)*(i-1))
 );
+
+end generate Gen_floor_control;
 
 end;
