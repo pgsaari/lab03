@@ -18,7 +18,7 @@ architecture stimulus of elevator_state_tb is
             clk: in std_logic;
             
             floor_call_array_up: in std_logic_vector(num_floors-1 downto 0) := (others => '0');
-				floor_call_array_down: in std_logic_vector(num_floors-1 downto 0) := (others => '0');
+			floor_call_array_down: in std_logic_vector(num_floors-1 downto 0) := (others => '0');
             destination_array: in std_logic_vector(num_floors-1 downto 0);
 
             direction: out std_logic;
@@ -34,7 +34,7 @@ architecture stimulus of elevator_state_tb is
 		  );
         port(
             clk: in std_logic; -- This is clock
-				input_clock : in std_logic; -- This is 50Mhz clock for input
+			input_clock : in std_logic; -- This is 50Mhz clock for input
             direction: in std_logic; -- This is direction of elevator
             current_floor: in std_logic_vector(3 downto 0); -- This is current floor of the elevator
             enable: in std_logic; --Used to tell floor_control when to latch in data
@@ -49,6 +49,37 @@ architecture stimulus of elevator_state_tb is
             destination_array: out std_logic_vector(num_floors-1 downto 0)
         ); 
     end component;
+	
+    component master_control is 
+        generic (
+                num_elevators: positive;
+                number_floors: positive
+        );
+        port(
+            clk: in std_logic; -- 50 MHz clock
+            enable: in std_logic; --enable for this component to latch data
+            states: in std_logic_vector(3*num_elevators-1 downto 0);--states of elevators
+            input_array: in std_logic_vector(5 downto 0);--input from board 
+            enable_floor_control: out std_logic_vector(num_elevators-1 downto 0) := (others => '0');--enables for floor control
+            
+            --USED TO SEND STATE OF MACHINE TO HEX FILE----------
+            state_of_machine: in std_logic_vector(3*num_elevators-1 downto 0) := (others => '0');
+            
+            ---USED TO SEND CURRENT FLOOR OF ELEVATOR TO HEX FILE
+            elvator_current_floor: in std_logic_vector(4*num_elevators-1 downto 0) := (others => '0');
+
+        ----USED TO SEND DIRECTION FROM STATE_MACHINE TO FLOOR_CONTROL------
+            direction_of_elevator: in std_logic_vector(num_elevators-1 downto 0) := (others => '0');
+
+        ---USED TO LINK DESTINATION ARRAY FROM FLOOR_CONTROL TO ELEVATOR_STATE
+            des_array: in std_logic_vector((number_floors)*num_elevators-1 downto 0) := (others => '0');
+
+        ---USED TO LINK FLOOR CALL ARRAY UP FROM FLOOR_CONTROL TO ELEVATOR_STATE
+            floor_array_up: in std_logic_vector((number_floors)*num_elevators-1 downto 0) := (others => '0');
+
+        ---USED TO LINK FLOOR CALL ARRAY DOWN FROM FLOOR_CONTROL TO ELEVATOR_STATE
+            floor_array_down: in std_logic_vector((number_floors)*num_elevators-1 downto 0) := (others => '0')
+    ); end component;
 
 
     -- not used yet
@@ -69,25 +100,50 @@ architecture stimulus of elevator_state_tb is
     end component gen_counter;
 	 
 	 CONSTANT number_floors: INTEGER := 16;
+     CONSTANT number_elevators: INTEGER := 2;
 	
     -- clock signal
     signal clk: std_logic;
 	 signal input_clk: std_logic;
 
     -- signals for state machine
-    signal floor_call_array_up: std_logic_vector(number_floors-1 downto 0)  := (others => '0');
-	 signal floor_call_array_down: std_logic_vector(number_floors-1 downto 0)  := (others => '0');
-    signal destination_array: std_logic_vector(number_floors-1 downto 0);-- := (others => '0');
-    signal direction: std_logic;
-    signal current_floor: std_logic_vector(3 downto 0);
-    signal state: std_logic_vector(2 downto 0);
-	 
+    signal floor_call_array_up: std_logic_vector((number_floors)*num_elevators-1 downto 0)  := (others => '0');
+	signal floor_call_array_down: std_logic_vector((number_floors)*num_elevators-1 downto 0)  := (others => '0');
+    signal destination_array: std_logic_vector((number_floors)*num_elevators-1 downto 0);
+    signal direction: std_logic_vector(num_elevators-1 downto 0);
+    signal current_floor: std_logic_vector(4*num_elevators-1 downto 0);
+    signal state_of_machine: std_logic_vector(3*num_elevators-1 downto 0);
+
+    -- signals for master control
+	signal floor_control_enable: std_logic_vector(num_elevators-1 downto 0);
+    signal enable: std_logic;
 
     -- signals for floor control
-    signal enable: std_logic;
+    
     signal input_array: std_logic_vector(5 downto 0);
 
 begin
+
+    M_control : master_control 
+        generic map(
+                num_elevators => number_elevators,
+                number_floors => number_floors
+        )
+        port map(
+
+            clk => CLOCK_50,
+            enable => enable, 
+            states => state_of_machine(3*num_elevators-1 downto 0), -- array keeps track of states of each elevator
+            input_array=> SW(5 downto 0), -- user enters inputs
+            enable_floor_control => floor_control_enable(num_elevators-1 downto 0), --tells floor_control when to latch in data
+            elvator_current_floor => current_floor(4*num_elevators-1 downto 0), --keeps track of current floor of each elevator
+            direction_of_elevator => direction(num_elevators-1 downto 0), --directions of each elevator
+            des_array => destination_array((number_floors)*num_elevators-1 downto 0),--LINK DESTINATION ARRAY FROM FLOOR_CONTROL TO ELEVATOR_STATE
+            floor_array_up => floor_call_array_up((number_floors)*num_elevators-1 downto 0), --LINK FLOOR CALL ARRAY UP FROM FLOOR_CONTROL TO ELEVATOR_STATE
+            floor_array_down => floor_call_array_down((number_floors)*num_elevators-1 downto 0) --LINK FLOOR CALL ARRAY DOWN FROM FLOOR_CONTROL TO ELEVATOR_STATE	 
+        );
+
+end;
 
     elevator_state1: elevator_state
 		  generic map(
@@ -95,12 +151,12 @@ begin
 		  ) 
         port map(
             clk => clk,
-            floor_call_array_up => floor_call_array_up, -- from floor control
-				floor_call_array_down => floor_call_array_down, -- from floor control
-            destination_array => destination_array, -- from floor control
-            direction => direction, -- to floor control
-            current_floor => current_floor, -- to floor control
-            state_out => state
+            floor_call_array_up => floor_call_array_up(number_floors -1 downto 0), -- from floor control
+			floor_call_array_down => floor_call_array_down(number_floors-1 downto 0), -- from floor control
+            destination_array => destination_array(num_floors-1 downto 0), -- from floor control
+            direction => direction(0), -- to floor control
+            current_floor => current_floor(3 downto 0), -- to floor control
+            state_out => state_of_machine(2 downto 0)
         );
 
     floor_control1: floor_control
@@ -109,14 +165,14 @@ begin
         ) 
         port map(
             clk => clk,
-				input_clock => input_clk,
-            direction => direction, -- from state machine
-            current_floor => current_floor, -- from state machine
-            enable => enable, -- from 'board'
-            state => state,
+			input_clock => input_clk,
+            direction => direction(0), -- from state machine
+            current_floor => current_floor(3 downto 0), -- from state machine
+            enable => enable_floor_control(0), -- from master_control
+            state => state_of_machine(2 downto 0),
             input_array => input_array, -- from 'board'
             floor_call_array_up => floor_call_array_up, -- to state machine
-				floor_call_array_down => floor_call_array_down, -- from floor control
+			floor_call_array_down => floor_call_array_down, -- from floor control
             destination_array => destination_array -- to state machine
         );
 
