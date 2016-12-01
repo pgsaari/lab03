@@ -50,26 +50,13 @@ set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 256
 set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (VHDL)"
 set_global_assignment -name EDA_TIME_SCALE "1 ps" -section_id eda_simulation
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT VHDL -section_id eda_simulation
-set_global_assignment -name VHDL_FILE seven_seg.vhd
-set_global_assignment -name VHDL_FILE gen_counter.vhd
-set_global_assignment -name VHDL_FILE elevator_state_tb.vhd
-set_global_assignment -name VHDL_FILE elevator_state.vhd
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
-set_global_assignment -name VHDL_FILE floor_control.vhd
-set_global_assignment -name VHDL_FILE elevator_top.vhd
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_location_assignment PIN_AF14 -to CLOCK_50
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CLOCK_50
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HEX0[6]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HEX0[5]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HEX0[4]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HEX0[3]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HEX0[2]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HEX0[1]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HEX0[0]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to KEY
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[4]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[3]
@@ -82,14 +69,56 @@ set_location_assignment PIN_AC12 -to SW[1]
 set_location_assignment PIN_AF9 -to SW[2]
 set_location_assignment PIN_AF10 -to SW[3]
 set_location_assignment PIN_AD11 -to SW[4]
-set_location_assignment PIN_AH28 -to HEX0[6]
-set_location_assignment PIN_AG28 -to HEX0[5]
-set_location_assignment PIN_AF28 -to HEX0[4]
-set_location_assignment PIN_AG27 -to HEX0[3]
-set_location_assignment PIN_AE28 -to HEX0[2]
-set_location_assignment PIN_AE27 -to HEX0[1]
-set_location_assignment PIN_AE26 -to HEX0[0]
 set_location_assignment PIN_AD12 -to SW[5]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[5]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW
+set_global_assignment -name VHDL_FILE master_control.vhd
+set_global_assignment -name VHDL_FILE seven_seg.vhd
+set_global_assignment -name VHDL_FILE gen_counter.vhd
+set_global_assignment -name VHDL_FILE elevator_state_tb.vhd
+set_global_assignment -name VHDL_FILE elevator_state.vhd
+set_global_assignment -name VHDL_FILE floor_control.vhd
+set_global_assignment -name VHDL_FILE elevator_top.vhd
+set_location_assignment PIN_AE26 -to Hex_Link[0]
+set_location_assignment PIN_AE27 -to Hex_Link[1]
+set_location_assignment PIN_AE28 -to Hex_Link[2]
+set_location_assignment PIN_AG27 -to Hex_Link[3]
+set_location_assignment PIN_AF28 -to Hex_Link[4]
+set_location_assignment PIN_AG28 -to Hex_Link[5]
+set_location_assignment PIN_AH28 -to Hex_Link[6]
+set_location_assignment PIN_AJ29 -to Hex_Link[7]
+set_location_assignment PIN_AH29 -to Hex_Link[8]
+set_location_assignment PIN_AH30 -to Hex_Link[9]
+set_location_assignment PIN_AG30 -to Hex_Link[10]
+set_location_assignment PIN_AF29 -to Hex_Link[11]
+set_location_assignment PIN_AF30 -to Hex_Link[12]
+set_location_assignment PIN_AD27 -to Hex_Link[13]
+set_location_assignment PIN_AB23 -to Hex_Link[14]
+set_location_assignment PIN_AE29 -to Hex_Link[15]
+set_location_assignment PIN_AD29 -to Hex_Link[16]
+set_location_assignment PIN_AC28 -to Hex_Link[17]
+set_location_assignment PIN_AD30 -to Hex_Link[18]
+set_location_assignment PIN_AC29 -to Hex_Link[19]
+set_location_assignment PIN_AC30 -to Hex_Link[20]
+set_location_assignment PIN_AD26 -to Hex_Link[21]
+set_location_assignment PIN_AC27 -to Hex_Link[22]
+set_location_assignment PIN_AD25 -to Hex_Link[23]
+set_location_assignment PIN_AC25 -to Hex_Link[24]
+set_location_assignment PIN_AB28 -to Hex_Link[25]
+set_location_assignment PIN_AB25 -to Hex_Link[26]
+set_location_assignment PIN_AB22 -to Hex_Link[27]
+set_location_assignment PIN_AA24 -to Hex_Link[28]
+set_location_assignment PIN_Y23 -to Hex_Link[29]
+set_location_assignment PIN_Y24 -to Hex_Link[30]
+set_location_assignment PIN_W22 -to Hex_Link[31]
+set_location_assignment PIN_W24 -to Hex_Link[32]
+set_location_assignment PIN_AA25 -to Hex_Link[41]
+set_location_assignment PIN_AA26 -to Hex_Link[40]
+set_location_assignment PIN_AB26 -to Hex_Link[39]
+set_location_assignment PIN_AB27 -to Hex_Link[38]
+set_location_assignment PIN_Y27 -to Hex_Link[37]
+set_location_assignment PIN_AA28 -to Hex_Link[36]
+set_location_assignment PIN_V25 -to Hex_Link[35]
+set_location_assignment PIN_W25 -to Hex_Link[34]
+set_location_assignment PIN_V23 -to Hex_Link[33]
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
