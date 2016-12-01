@@ -19,7 +19,7 @@ entity elevator_top is Port(
 	
 	--////////////////////////	DPDT Switch		////////////////////////
 	--0-3: SPECIFY FLOOR, 4: DIRECTION (UP(1), DOWN(0)), 5: FLOOR CALL(0) OR DESTINATION CALL(1)
-	SW			:in		std_logic_vector(5 downto 0) -- 
+	SW			:in		std_logic_vector(8 downto 0) -- 
 	
 ); end entity elevator_top;
 
@@ -142,10 +142,8 @@ port(
 	 enable: in std_logic; --enable for this component to latch data
     states: in std_logic_vector(3*num_elevators-1 downto 0);--states of elevators
     input_array: in std_logic_vector(5 downto 0);--input from board 
+	 input_choose_elevator: in std_logic_vector(2 downto 0);
     enable_floor_control: out std_logic_vector(num_elevators-1 downto 0) := (others => '0');--enables for floor control
-	 
-	 --USED TO SEND STATE OF MACHINE TO HEX FILE----------
-	 state_of_machine: in std_logic_vector(3*num_elevators-1 downto 0) := (others => '0');
     
 	 ---USED TO SEND CURRENT FLOOR OF ELEVATOR TO HEX FILE
 	 elvator_current_floor: in std_logic_vector(4*num_elevators-1 downto 0) := (others => '0');
@@ -271,10 +269,8 @@ port map(
 	 enable => (not KEY),
     states => state_of_machine(3*num_elevators-1 downto 0),
     input_array=> SW(5 downto 0),
+	 input_choose_elevator => SW(8 downto 6),
     enable_floor_control => floor_control_enable(num_elevators-1 downto 0), --Used to tell floor_control when to latch in data
-	 
-	 --USED TO SEND STATE OF MACHINE TO HEX FILE----------
-	 state_of_machine => state_of_machine(3*num_elevators-1 downto 0),
     
 	 ---USED TO SEND CURRENT FLOOR OF ELEVATOR TO HEX FILE
 	 elvator_current_floor => elvator_current_floor(4*num_elevators-1 downto 0),
