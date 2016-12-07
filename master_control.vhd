@@ -17,19 +17,19 @@ port(
 	 input_choose_elevator: in std_logic_vector(2 downto 0);--input from board used if destination is chosen to choose elevator
     enable_floor_control: out std_logic_vector(num_elevators-1 downto 0) := (others => '0');--enables for floor control
 	 
-	 ---USED TO SEND CURRENT FLOOR OF ELEVATOR TO HEX FILE
+	 ---CURRENT FLOOR OF ELEVATOR(s)
 	 elvator_current_floor: in std_logic_vector(4*num_elevators-1 downto 0) := (others => '0');
 
-----USED TO SEND DIRECTION FROM STATE_MACHINE TO FLOOR_CONTROL------
+----DIRECTION FROM ELEVATOR(S)------
 	 direction_of_elevator: in std_logic_vector(num_elevators-1 downto 0) := (others => '0');
 
----USED TO LINK DESTINATION ARRAY FROM FLOOR_CONTROL TO ELEVATOR_STATE
+---DESTINATION ARRAY OF ELEVATOR(S)
     des_array: in std_logic_vector((number_floors)*num_elevators-1 downto 0) := (others => '0');
 
----USED TO LINK FLOOR CALL ARRAY UP FROM FLOOR_CONTROL TO ELEVATOR_STATE
+---FLOOR CALL ARRAY UP OF ELEVATOR(S)
     floor_array_up: in std_logic_vector((number_floors)*num_elevators-1 downto 0) := (others => '0');
 
----USED TO LINK FLOOR CALL ARRAY DOWN FROM FLOOR_CONTROL TO ELEVATOR_STATE
+---FLOOR CALL ARRAY DOWN OF ELEVATOR(S)
     floor_array_down: in std_logic_vector((number_floors)*num_elevators-1 downto 0) := (others => '0')
 ); end entity;
 
@@ -44,7 +44,7 @@ architecture logic of master_control is
 	 
 begin
 
-input:process(clk,enable) begin
+input:process(enable) begin
 	if rising_edge(clk) Then
 		if enable = '1' Then
 			found_elevator <='1';
@@ -52,7 +52,7 @@ input:process(clk,enable) begin
 				i_enable_floor_control((to_integer(unsigned(input_choose_elevator)))-1) <= '1'; -- set the designated elevators floor control enable to '1' to latch in data
 				found_elevator <='0';
 			end if;
-			if found_elevator= '1' Then
+			if found_elevator= '1' AND input_array(5) = '0' Then
 				for i in 1 to num_elevators loop 
 					if (states((3+(i-1)*3)-1 downto 3*(i-1)) = "000") Then --Check if there is an idle elevator
 						i_enable_floor_control(i-1) <= '1'; -- set the designated elevators floor control enable to '1' to latch in data
@@ -61,13 +61,13 @@ input:process(clk,enable) begin
 					end if;
 				end loop;
 			end if;
-			if found_elevator = '1' Then
+			if found_elevator = '1' AND input_array(5) = '0' Then
 			
 			end if;
-			if found_elevator = '1' Then
+			if found_elevator = '1' AND input_array(5) = '0' Then
 			
 			end if;
-			if found_elevator = '1' Then
+			if found_elevator = '1' AND input_array(5) = '0' Then
 			
 			end if;
 		else

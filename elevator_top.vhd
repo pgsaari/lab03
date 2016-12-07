@@ -19,6 +19,7 @@ entity elevator_top is Port(
 	
 	--////////////////////////	DPDT Switch		////////////////////////
 	--0-3: SPECIFY FLOOR, 4: DIRECTION (UP(1), DOWN(0)), 5: FLOOR CALL(0) OR DESTINATION CALL(1)
+	--5-8: SECIFY THE ELEVATOR WHEN A DESTINATION WANTS TO BE SET.
 	SW			:in		std_logic_vector(8 downto 0) -- 
 	
 ); end entity elevator_top;
