@@ -152,14 +152,12 @@ port(
 ----USED TO SEND DIRECTION FROM STATE_MACHINE TO FLOOR_CONTROL------
 	 direction_of_elevator: in std_logic_vector(num_elevators-1 downto 0) := (others => '0');
 
----USED TO LINK DESTINATION ARRAY FROM FLOOR_CONTROL TO ELEVATOR_STATE
-    des_array: in std_logic_vector((number_floors)*num_elevators-1 downto 0) := (others => '0');
-
 ---USED TO LINK FLOOR CALL ARRAY UP FROM FLOOR_CONTROL TO ELEVATOR_STATE
     floor_array_up: in std_logic_vector((number_floors)*num_elevators-1 downto 0) := (others => '0');
 
 ---USED TO LINK FLOOR CALL ARRAY DOWN FROM FLOOR_CONTROL TO ELEVATOR_STATE
     floor_array_down: in std_logic_vector((number_floors)*num_elevators-1 downto 0) := (others => '0')
+	 
 ); end component;
 	
 	
@@ -278,9 +276,6 @@ port map(
 
 ----USED TO SEND DIRECTION FROM STATE_MACHINE TO FLOOR_CONTROL------
 	 direction_of_elevator => direction_of_elevator(num_elevators-1 downto 0),
-
----USED TO LINK DESTINATION ARRAY FROM FLOOR_CONTROL TO ELEVATOR_STATE
-    des_array => des_array((number_floors)*num_elevators-1 downto 0),
 
 ---USED TO LINK FLOOR CALL ARRAY UP FROM FLOOR_CONTROL TO ELEVATOR_STATE
     floor_array_up => floor_array_up((number_floors)*num_elevators-1 downto 0),
