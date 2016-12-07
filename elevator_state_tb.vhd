@@ -30,8 +30,8 @@ architecture stimulus of elevator_state_tb is
     end component elevator_state;
 
     component floor_control is 
-		  generic (
-				num_floors: positive -- states how many floors
+		generic (
+		    num_floors: positive -- states how many floors
 		  );
         port(
             clk: in std_logic; -- This is clock
@@ -53,23 +53,24 @@ architecture stimulus of elevator_state_tb is
 	
     component master_control is 
         generic (
-                num_elevators: positive;
-                number_floors: positive
+		    num_elevators: positive;
+		    number_floors: positive
         );
         port(
-            clk: in std_logic; -- 50 MHz clock
-            enable: in std_logic; --enable for this component to latch data
-            states: in std_logic_vector(3*num_elevators-1 downto 0);--states of elevators
-            input_array: in std_logic_vector(5 downto 0);--input from board 
-            input_choose_elevator: in std_logic_vector(2 downto 0);--input from board used if destination is chosen to choose elevator
-            enable_floor_control: out std_logic_vector(num_elevators-1 downto 0);--enables for floor control
-            
-            ---USED TO SEND CURRENT FLOOR OF ELEVATOR TO HEX FILE
-            elvator_current_floor: in std_logic_vector(4*num_elevators-1 downto 0) := (others => '0');
 
-        ----USED TO SEND DIRECTION FROM STATE_MACHINE TO FLOOR_CONTROL------
-            direction_of_elevator: in std_logic_vector(num_elevators-1 downto 0) := (others => '0')
-    ); end component;
+            clk: in std_logic; -- 50 MHz clock
+	        enable: in std_logic; --enable for this component to latch data
+            states: in std_logic_vector(3*num_elevators-1 downto 0);--states of elevators
+            input_array: in std_logic_vector(5 downto 0);--input from board which also goes to elevators
+	        input_choose_elevator: in std_logic_vector(2 downto 0);--input from board used if destination is chosen to choose elevator
+            enable_floor_control: out std_logic_vector(num_elevators-1 downto 0) := (others => '0');--enables for floor control
+            elvator_current_floor: in std_logic_vector(4*num_elevators-1 downto 0) := (others => '0');
+            direction_of_elevator: in std_logic_vector(num_elevators-1 downto 0) := (others => '0');
+            floor_array_up: in std_logic_vector((number_floors)*num_elevators-1 downto 0) := (others => '0');
+            floor_array_down: in std_logic_vector((number_floors)*num_elevators-1 downto 0) := (others => '0')
+
+        ); 
+    end component;
 
 	 
 	 CONSTANT number_floors: INTEGER := 5;
@@ -98,11 +99,16 @@ architecture stimulus of elevator_state_tb is
 	signal floor_control_enable: std_logic_vector(number_elevators-1 downto 0) := (others => '0');
     signal enable: std_logic := '0';
     signal input_choose_elevator: std_logic_vector(2 downto 0);
+    signal total_floor_call_up: std_logic_vector((number_floors)*number_elevators-1 downto 0) := floor_call_array_up & floor_call_array_up2;
+    signal total_floor_call_down: std_logic_vector((number_floors)*number_elevators-1 downto 0) := floor_call_array_down & floor_call_array_down2;
+    
 
     -- signals for floor control
     signal input_array: std_logic_vector(5 downto 0);
 
 begin
+    total_floor_call_up <= (others => '0');
+    total_floor_call_down <= (others => '0');
 
     M_control : master_control 
         generic map(
@@ -117,7 +123,9 @@ begin
             input_choose_elevator => input_choose_elevator,
             enable_floor_control => floor_control_enable(number_elevators-1 downto 0), --tells floor_control when to latch in data
             elvator_current_floor => current_floor(4*number_elevators-1 downto 0), --keeps track of current floor of each elevator
-            direction_of_elevator => direction(number_elevators-1 downto 0) --directions of each elevator	 
+            direction_of_elevator => direction(number_elevators-1 downto 0), --directions of each elevator	
+            floor_array_up => total_floor_call_up,
+            floor_array_down => total_floor_call_down
         );
 
     elevator_state1: elevator_state
@@ -208,7 +216,7 @@ begin
 
         -- Test Case 1: Elevator responds to floor call from idle state
         
-        input_array <= "010101"; -- floor call going up at floor 5
+        input_array <= "110101"; -- floor call going up at floor 5
         wait for 1*CLK_PER;
         enable <= '1';
         wait for 3*CLK_PER;

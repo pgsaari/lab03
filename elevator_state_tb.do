@@ -36,11 +36,13 @@ add wave -divider -height 10 Inputs
 add wave -radix binary /input_array
 add wave -radix binary /enable
 
-add wave -group Master -radix binary /M_control/enable
-add wave -group Master -radix binary /floor_control_enable
+add wave -group Master -radix binary /M_control/i_enable_floor_control
 add wave -group Master -radix binary /current_floor
 add wave -group Master -radix binary /direction
 add wave -group Master -radix binary /state_of_machine
-add wave -group Master -radix binary /M_control/found_elevator
+add wave -group Master -radix binary /M_control/floor_array_up
+add wave -group Master -radix binary /M_control/floor_array_down
+add wave -group Master -radix binary {/M_control/input_array[5]}
+add wave -group Master -radix binary /M_control/input/check
 
 run 1000 ns
