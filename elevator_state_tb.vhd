@@ -77,34 +77,34 @@ architecture stimulus of elevator_state_tb is
      CONSTANT number_elevators: INTEGER := 2;
 	
     -- clock signal
-    signal clk: std_logic;
-	 signal input_clk: std_logic;
+    signal clk: std_logic := '0';
+	 signal input_clk: std_logic := '0';
 
     -- signals for elevator state machine 1
-    signal floor_call_array_up: std_logic_vector(number_floors-1 downto 0);
-	signal floor_call_array_down: std_logic_vector(number_floors-1 downto 0);
-    signal destination_array: std_logic_vector(number_floors-1 downto 0);
+    signal floor_call_array_up: std_logic_vector(number_floors-1 downto 0) := (others=>'0');
+	signal floor_call_array_down: std_logic_vector(number_floors-1 downto 0) := (others=>'0');
+    signal destination_array: std_logic_vector(number_floors-1 downto 0) := (others=>'0');
 
     -- signals for elevator state machine 2
-    signal floor_call_array_up2: std_logic_vector(number_floors-1 downto 0);
-	signal floor_call_array_down2: std_logic_vector(number_floors-1 downto 0);
-    signal destination_array2: std_logic_vector(number_floors-1 downto 0);
+    signal floor_call_array_up2: std_logic_vector(number_floors-1 downto 0) := (others=>'0');
+	signal floor_call_array_down2: std_logic_vector(number_floors-1 downto 0) := (others=>'0');
+    signal destination_array2: std_logic_vector(number_floors-1 downto 0) := (others=>'0');
 
     -- signals shared between elevators
-    signal direction: std_logic_vector(number_elevators-1 downto 0);
-    signal current_floor: std_logic_vector(4*number_elevators-1 downto 0);
-    signal state_of_machine: std_logic_vector(3*number_elevators-1 downto 0);
+    signal direction: std_logic_vector(number_elevators-1 downto 0) := (others=>'0');
+    signal current_floor: std_logic_vector(4*number_elevators-1 downto 0) := (others=>'0');
+    signal state_of_machine: std_logic_vector(3*number_elevators-1 downto 0) := (others=>'0');
 
     -- signals for master control
 	signal floor_control_enable: std_logic_vector(number_elevators-1 downto 0) := (others => '0');
     signal enable: std_logic := '0';
-    signal input_choose_elevator: std_logic_vector(2 downto 0);
+    signal input_choose_elevator: std_logic_vector(2 downto 0) := (others=>'0');
     signal total_floor_call_up: std_logic_vector((number_floors)*number_elevators-1 downto 0) := floor_call_array_up & floor_call_array_up2;
     signal total_floor_call_down: std_logic_vector((number_floors)*number_elevators-1 downto 0) := floor_call_array_down & floor_call_array_down2;
     
 
     -- signals for floor control
-    signal input_array: std_logic_vector(5 downto 0);
+    signal input_array: std_logic_vector(5 downto 0) := (others=>'0');
 
 begin
     total_floor_call_up <= (others => '0');
@@ -216,10 +216,10 @@ begin
 
         -- Test Case 1: Elevator responds to floor call from idle state
         
-        input_array <= "110101"; -- floor call going up at floor 5
+        input_array <= "010101"; -- floor call going up at floor 5
         wait for 1*CLK_PER;
         enable <= '1';
-        wait for 3*CLK_PER;
+        wait for 10*CLK_PER;
         enable <= '0';
         wait for 25*CLK_PER;
         report "End of Test Case 1" -- 560 ns

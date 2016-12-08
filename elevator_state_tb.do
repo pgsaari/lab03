@@ -17,6 +17,8 @@ add wave -group Elevator1 -radix binary /elevator_state1/floor_call
 add wave -group Elevator1 -radix binary /destination_array
 add wave -group Elevator1 -radix binary /elevator_state1/destination
 add wave -group Elevator1 -radix binary /elevator_state1/floor_stop
+add wave -group Elevator1 -radix binary /floor_control1/input_array
+add wave -group Elevator1 -radix binary /floor_control1/enable
 
 add wave -divider -height 10 Elevator2
 
@@ -30,6 +32,8 @@ add wave -group Elevator2 -radix binary /elevator_state2/floor_call
 add wave -group Elevator2 -radix binary /destination_array
 add wave -group Elevator2 -radix binary /elevator_state2/destination
 add wave -group Elevator2 -radix binary /elevator_state2/floor_stop
+add wave -group Elevator2 -radix binary /floor_control2/input_array
+add wave -group Elevator2 -radix binary /floor_control2/enable
 
 add wave -divider -height 10 Inputs
 
@@ -37,6 +41,7 @@ add wave -radix binary /input_array
 add wave -radix binary /enable
 
 add wave -group Master -radix binary /M_control/i_enable_floor_control
+add wave -group Master -radix binary /M_control/enable_floor_control
 add wave -group Master -radix binary /current_floor
 add wave -group Master -radix binary /direction
 add wave -group Master -radix binary /state_of_machine
@@ -44,5 +49,10 @@ add wave -group Master -radix binary /M_control/floor_array_up
 add wave -group Master -radix binary /M_control/floor_array_down
 add wave -group Master -radix binary {/M_control/input_array[5]}
 add wave -group Master -radix binary /M_control/input/check
+add wave -group Master -radix binary /M_control/input_array
+add wave -group Master -radix binary /M_control/double_floor_calls 
+add wave -group Master -radix binary /M_control/enable 
+add wave -group Master -radix binary /M_control/states
+add wave -group Master -radix binary /M_control/clk
 
 run 1000 ns

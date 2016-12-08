@@ -33,19 +33,12 @@ port(
 
 architecture logic of master_control is
 	
-	signal which_array : std_logic:= '0'; -- '0' is write to i_floor_call_array & '1' is write to i_destination_array
-	signal which_direction : std_logic:= '0'; -- '0' is direction down & '1' is direction up
-	signal which_floor : unsigned(3 downto 0):= (others => '0'); -- This specifies the floor to write (swtich 0 = floor 0, switch 1 = floor 1 etc.)
    signal i_enable_floor_control: std_logic_vector(num_elevators-1 downto 0) := (others => '0');--enables for floor control
-	
-	signal found_elevator: std_logic := '0';-- Used within input process to check if we found an elevator
-	signal found_elevator2: std_logic := '0';-- Used within input process to check if we found an elevator
-	
-	signal double_floor_calls : std_logic_vector(number_floors-1 downto 0);
+	signal double_floor_calls : std_logic_vector(number_floors-1 downto 0)  := (others => '0');
 	 
 begin
 
-input:process(enable) 
+input:process(enable, clk) 
 	variable check : std_logic := '1';
 begin
 	if rising_edge(clk) Then
@@ -54,8 +47,7 @@ begin
 			-- first check if this call is a destination call
 			if input_array(5) = '1' Then 
 				i_enable_floor_control((to_integer(unsigned(input_choose_elevator)))) <= '1'; -- set the designated elevators floor control enable to '1' to latch in data
-				found_elevator <='0';
-				found_elevator2 <='0';
+				check :='0';
 			else
 				-- Check if there has already been a floor call to the current floor goin up or down
 				-- Skip call if call already exist
@@ -65,6 +57,7 @@ begin
 							double_floor_calls <= floor_array_up(((number_floors)+(i-1)*(number_floors))-1 downto (number_floors)*(i-1));
 							if double_floor_calls(to_integer(unsigned(input_array(3 downto 0)))) = '1' Then
 								check := '0';
+								exit;
 							end if;
 						end loop;
 					else
@@ -72,6 +65,7 @@ begin
 							double_floor_calls <= floor_array_down(((number_floors)+(i-1)*(number_floors))-1 downto (number_floors)*(i-1));
 							if double_floor_calls(to_integer(unsigned(input_array(3 downto 0)))) = '1' Then
 								check := '0';
+								exit;
 							end if;
 						end loop;
 					end if;
@@ -92,6 +86,7 @@ begin
 						if unsigned(elvator_current_floor((4+(i-1)*4)-1 downto 4*(i-1))) <= unsigned(input_array(3 downto 0)) AND direction_of_elevator(i-1) = '1' AND input_array(4) = '1' Then
 							i_enable_floor_control(i-1) <= '1';
 							check := '0';
+							exit;
 						end if;
 					end loop;
 				end if;
@@ -100,7 +95,8 @@ begin
 					for i in 1 to num_elevators loop 
 						if unsigned(elvator_current_floor((4+(i-1)*4)-1 downto 4*(i-1))) >= unsigned(input_array(3 downto 0)) AND direction_of_elevator(i-1) = '0' AND input_array(4) = '0' Then
 							i_enable_floor_control(i-1) <= '1';
-							found_elevator <= '0';
+							check := '0';
+							exit;
 						end if;
 					end loop;
 				end if;

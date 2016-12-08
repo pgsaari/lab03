@@ -7,15 +7,15 @@ z2
 !i10e 25
 !i10f 100
 cModel Technology
-Z0 dC:/Users/Paul/Documents/Homework/Digital_Logic_Lab/lab_03
+dC:/Users/Paul/Documents/Homework/Digital_Logic_Lab/lab_03
 Eelevator_state
-Z1 w1479865604
-Z2 DPx4 ieee 15 std_logic_arith 0 22 [G314=:2zXJ`VORJe1J@Z1
-Z3 DPx4 ieee 18 std_logic_unsigned 0 22 ;eZjO2D4ZDz<]0>8AL<ne1
-Z4 DPx4 ieee 11 numeric_std 0 22 :ASDNFgHXf_ih3J@9F3Ze1
-Z5 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
-Z6 DPx4 ieee 14 std_logic_1164 0 22 eNV`TJ_GofJTzYa?f<@Oe1
-R0
+Z0 w1479861550
+Z1 DPx4 ieee 15 std_logic_arith 0 22 [G314=:2zXJ`VORJe1J@Z1
+Z2 DPx4 ieee 18 std_logic_unsigned 0 22 ;eZjO2D4ZDz<]0>8AL<ne1
+Z3 DPx4 ieee 11 numeric_std 0 22 :ASDNFgHXf_ih3J@9F3Ze1
+Z4 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
+Z5 DPx4 ieee 14 std_logic_1164 0 22 eNV`TJ_GofJTzYa?f<@Oe1
+Z6 dC:/Users/Ricardo/Documents/Altera/EE457/ELEVATOR
 Z7 8elevator_state.vhd
 Z8 Felevator_state.vhd
 l0
@@ -24,19 +24,19 @@ V^;H67ELVG8BMAidOH@oP00
 !s100 IIVceDWzXW[j<PHJMLTS71
 Z9 OV;C;10.4d;61
 32
-Z10 !s110 1481146300
+Z10 !s110 1481159746
 !i10b 1
-Z11 !s108 1481146300.000000
+Z11 !s108 1481159746.000000
 Z12 !s90 -reportprogress|300|elevator_state.vhd|floor_control.vhd|elevator_state_tb.vhd|master_control.vhd|
 Z13 !s107 master_control.vhd|elevator_state_tb.vhd|floor_control.vhd|elevator_state.vhd|
 !i113 1
 Z14 tExplicit 1
 Alogic
+R1
 R2
 R3
 R4
 R5
-R6
 Z15 DEx4 work 14 elevator_state 0 22 ^;H67ELVG8BMAidOH@oP00
 l52
 L28
@@ -52,13 +52,13 @@ R13
 !i113 1
 R14
 Eelevator_state_tb
-Z18 w1481146288
+Z18 w1481158203
+R1
 R2
 R3
 R4
 R5
 R6
-R0
 Z19 8elevator_state_tb.vhd
 Z20 Felevator_state_tb.vhd
 l0
@@ -67,7 +67,7 @@ V>7eKDW9ji3iVJa=3o7`o]3
 !s100 ]gmY_F:CBX0a[]@d=mjfJ3
 R9
 32
-Z21 !s110 1481146301
+R10
 !i10b 1
 R11
 R12
@@ -75,19 +75,19 @@ R13
 !i113 1
 R14
 Astimulus
+R1
 R2
 R3
 R4
 R5
-R6
-Z22 DEx4 work 17 elevator_state_tb 0 22 >7eKDW9ji3iVJa=3o7`o]3
+Z21 DEx4 work 17 elevator_state_tb 0 22 >7eKDW9ji3iVJa=3o7`o]3
 l109
 L9
-V^9^=@=Uli0bS_W:7DXO063
-!s100 Oa1DLzn9?gT_GH@Sl3jZX2
+Z22 VPhSa9Z73@XUlWZ65TYhYO1
+Z23 !s100 RY?dgSfdA0OS;2fU;@Gz:3
 R9
 32
-R21
+R10
 !i10b 1
 R11
 R12
@@ -95,15 +95,15 @@ R13
 !i113 1
 R14
 Efloor_control
-Z23 w1480473660
+Z24 w1480473481
+R1
 R2
 R3
 R4
 R5
 R6
-R0
-Z24 8floor_control.vhd
-Z25 Ffloor_control.vhd
+Z25 8floor_control.vhd
+Z26 Ffloor_control.vhd
 l0
 L6
 VUMdl9R7XP_ClFYe`0@3NP0
@@ -118,16 +118,16 @@ R13
 !i113 1
 R14
 Alogic
+R1
 R2
 R3
 R4
 R5
-R6
-Z26 DEx4 work 13 floor_control 0 22 UMdl9R7XP_ClFYe`0@3NP0
+Z27 DEx4 work 13 floor_control 0 22 UMdl9R7XP_ClFYe`0@3NP0
 l45
 L35
-Z27 VJ]@mOXhfX]JV3S84c;HiA1
-Z28 !s100 9;DC=PRQKogCTWgKd0]Se3
+Z28 VJ]@mOXhfX]JV3S84c;HiA1
+Z29 !s100 9;DC=PRQKogCTWgKd0]Se3
 R9
 32
 R10
@@ -138,22 +138,22 @@ R13
 !i113 1
 R14
 Emaster_control
-Z29 w1481144556
+Z30 w1481158855
+R1
 R2
 R3
 R4
 R5
 R6
-R0
-Z30 8master_control.vhd
-Z31 Fmaster_control.vhd
+Z31 8master_control.vhd
+Z32 Fmaster_control.vhd
 l0
 L6
 VhdIoMK3TbgR6JIHhGBjfn1
 !s100 AE0U5>Lh<PUQLUOjDBKjg1
 R9
 32
-R21
+R10
 !i10b 1
 R11
 R12
@@ -161,19 +161,19 @@ R13
 !i113 1
 R14
 Alogic
+R1
 R2
 R3
 R4
 R5
-R6
-Z32 DEx4 work 14 master_control 0 22 hdIoMK3TbgR6JIHhGBjfn1
-l46
+Z33 DEx4 work 14 master_control 0 22 hdIoMK3TbgR6JIHhGBjfn1
+l39
 L34
-Z33 VCXShBV:8Wo;_W@zXQa_`^3
-Z34 !s100 G;J8c[JLmQn2Ve7DNBiME1
+Z34 VPaLibhUWKhL944zF15[?82
+Z35 !s100 gPInmJM5hH@11WcA?A`nZ2
 R9
 32
-R21
+R10
 !i10b 1
 R11
 R12
