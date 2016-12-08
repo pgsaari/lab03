@@ -8,7 +8,7 @@ end entity elevator_state_tb;
 
 architecture stimulus of elevator_state_tb is
 
-    constant CLK_PER: time := 20 ns; -- clock period
+    constant CLK_PER: time := 10 ns; -- clock period
     constant CLK_PER_FAST: time := 1 ns;
 
     component elevator_state is 
@@ -81,13 +81,13 @@ architecture stimulus of elevator_state_tb is
 	 signal input_clk: std_logic;
 
     -- signals for elevator state machine 1
-    signal floor_call_array_up: std_logic_vector(number_floors-1 downto 0);
-	signal floor_call_array_down: std_logic_vector(number_floors-1 downto 0);
+    --signal floor_call_array_up: std_logic_vector(number_floors-1 downto 0);
+	--signal floor_call_array_down: std_logic_vector(number_floors-1 downto 0);
     signal destination_array: std_logic_vector(number_floors-1 downto 0);
 
     -- signals for elevator state machine 2
-    signal floor_call_array_up2: std_logic_vector(number_floors-1 downto 0);
-	signal floor_call_array_down2: std_logic_vector(number_floors-1 downto 0);
+    --signal floor_call_array_up2: std_logic_vector(number_floors-1 downto 0);
+	--signal floor_call_array_down2: std_logic_vector(number_floors-1 downto 0);
     signal destination_array2: std_logic_vector(number_floors-1 downto 0);
 
     -- signals shared between elevators
@@ -99,16 +99,14 @@ architecture stimulus of elevator_state_tb is
 	signal floor_control_enable: std_logic_vector(number_elevators-1 downto 0) := (others => '0');
     signal enable: std_logic := '0';
     signal input_choose_elevator: std_logic_vector(2 downto 0);
-    signal total_floor_call_up: std_logic_vector((number_floors)*number_elevators-1 downto 0) := floor_call_array_up & floor_call_array_up2;
-    signal total_floor_call_down: std_logic_vector((number_floors)*number_elevators-1 downto 0) := floor_call_array_down & floor_call_array_down2;
+    signal total_floor_call_up: std_logic_vector((number_floors)*number_elevators-1 downto 0);
+    signal total_floor_call_down: std_logic_vector((number_floors)*number_elevators-1 downto 0);
     
 
     -- signals for floor control
     signal input_array: std_logic_vector(5 downto 0);
 
 begin
-    total_floor_call_up <= (others => '0');
-    total_floor_call_down <= (others => '0');
 
     M_control : master_control 
         generic map(
@@ -134,8 +132,8 @@ begin
 		  ) 
         port map(
             clk => clk,
-            floor_call_array_up => floor_call_array_up, -- from floor control
-			floor_call_array_down => floor_call_array_down, -- from floor control
+            floor_call_array_up => total_floor_call_up(number_floors-1 downto 0), -- from floor control
+			floor_call_array_down => total_floor_call_down(number_floors-1 downto 0), -- from floor control
             destination_array => destination_array, -- from floor control
             direction => direction(0), -- to floor control
             current_floor => current_floor(3 downto 0), -- to floor control
@@ -154,8 +152,8 @@ begin
             enable => floor_control_enable(0), -- from master_control
             state => state_of_machine(2 downto 0),
             input_array => input_array, -- from 'board'
-            floor_call_array_up => floor_call_array_up, -- to state machine
-			floor_call_array_down => floor_call_array_down, -- from floor control
+            floor_call_array_up => total_floor_call_up(number_floors-1 downto 0), -- to state machine
+			floor_call_array_down => total_floor_call_down(number_floors-1 downto 0), -- from floor control
             destination_array => destination_array -- to state machine
         );
 
@@ -165,8 +163,8 @@ begin
 		  ) 
         port map(
             clk => clk,
-            floor_call_array_up => floor_call_array_up2, -- from floor control
-			floor_call_array_down => floor_call_array_down2, -- from floor control
+            floor_call_array_up => total_floor_call_up((number_elevators)*number_floors-1 downto number_floors), -- from floor control
+			floor_call_array_down => total_floor_call_down((number_elevators)*number_floors-1 downto number_floors), -- from floor control
             destination_array => destination_array2, -- from floor control
             direction => direction(1), -- to floor control
             current_floor => current_floor(4*number_elevators-1 downto 4), -- to floor control
@@ -185,8 +183,8 @@ begin
             enable => floor_control_enable(1), -- from master_control
             state => state_of_machine(3*number_elevators-1 downto 3),
             input_array => input_array, -- from 'board'
-            floor_call_array_up => floor_call_array_up2, -- to state machine
-			floor_call_array_down => floor_call_array_down2, -- from floor control
+            floor_call_array_up => total_floor_call_up((number_elevators)*number_floors-1 downto number_floors), -- to state machine
+			floor_call_array_down => total_floor_call_down((number_elevators)*number_floors-1 downto number_floors), -- from floor control
             destination_array => destination_array2 -- to state machine
         );
 
@@ -216,11 +214,16 @@ begin
 
         -- Test Case 1: Elevator responds to floor call from idle state
         
-        input_array <= "110101"; -- floor call going up at floor 5
+        input_array <= "010100"; -- floor call going up at floor 5
         wait for 1*CLK_PER;
         enable <= '1';
         wait for 3*CLK_PER;
         enable <= '0';
+        wait for 6*CLK_PER;
+        enable <= '1';
+        wait for 3*CLK_PER;
+        enable <= '0';
+        wait for 1*CLK_PER;
         wait for 25*CLK_PER;
         report "End of Test Case 1" -- 560 ns
 		severity WARNING;

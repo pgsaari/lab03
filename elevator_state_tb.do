@@ -11,8 +11,8 @@ add wave -radix unsigned /elevator_state1/current_floor
 add wave -radix ascii /elevator_state1/current_state
 add wave -group Elevator1 -radix ascii /elevator_state1/next_state
 add wave -group Elevator1 -radix binary /elevator_state1/i_direction
-add wave -group Elevator1 -radix binary /floor_call_array_up
-add wave -group Elevator1 -radix binary /floor_call_array_down
+add wave -group Elevator1 -radix binary {/total_floor_call_up[4:0]}
+add wave -group Elevator1 -radix binary {/total_floor_call_down[4:0]}
 add wave -group Elevator1 -radix binary /elevator_state1/floor_call
 add wave -group Elevator1 -radix binary /destination_array
 add wave -group Elevator1 -radix binary /elevator_state1/destination
@@ -24,8 +24,8 @@ add wave -radix unsigned /elevator_state2/current_floor
 add wave -radix ascii /elevator_state2/current_state
 add wave -group Elevator2 -radix ascii /elevator_state2/next_state
 add wave -group Elevator2 -radix binary /elevator_state2/i_direction
-add wave -group Elevator2 -radix binary /floor_call_array_up2
-add wave -group Elevator2 -radix binary /floor_call_array_down2
+add wave -group Elevator2 -radix binary {/total_floor_call_up[9:5]}
+add wave -group Elevator2 -radix binary {/total_floor_call_down[9:5]}
 add wave -group Elevator2 -radix binary /elevator_state2/floor_call
 add wave -group Elevator2 -radix binary /destination_array
 add wave -group Elevator2 -radix binary /elevator_state2/destination
@@ -44,5 +44,6 @@ add wave -group Master -radix binary /M_control/floor_array_up
 add wave -group Master -radix binary /M_control/floor_array_down
 add wave -group Master -radix binary {/M_control/input_array[5]}
 add wave -group Master -radix binary /M_control/input/check
+add wave -group Master -radix binary /M_control/input_choose_elevator
 
 run 1000 ns
