@@ -24,7 +24,7 @@ architecture stimulus of elevator_state_tb is
 
             direction: out std_logic;
             door: out std_logic; -- 1 for open, 0 for close
-            current_floor: out std_logic_vector(3 downto 0) := (others => '0'); -- 8 floors max
+            current_floor: out std_logic_vector(3 downto 0);
             state_out: out std_logic_vector(2 downto 0)
        ); 
     end component elevator_state;
@@ -73,7 +73,7 @@ architecture stimulus of elevator_state_tb is
     end component;
 
 	 
-	 CONSTANT number_floors: INTEGER := 5;
+	 CONSTANT number_floors: INTEGER := 10;
      CONSTANT number_elevators: INTEGER := 2;
 	
     -- clock signal
@@ -189,9 +189,9 @@ begin
     clk_proc: process
     	begin
 		    clk <= '0';
-		    wait for CLK_PER * 3;
+		    wait for CLK_PER;
 		    clk <= '1';
-		    wait for CLK_PER * 3;
+		    wait for CLK_PER;
 	    end process clk_proc;
 ----------------------------------------------------
 
@@ -206,43 +206,55 @@ begin
 ----------------------------------------------------
 
     vectors: process begin
-
-        wait for 1*CLK_PER;
-
-        -- Test Case 1: Elevator responds to floor call from idle state
-        
-
-        input_array <= "010100"; -- floor call going up at floor 4
-        wait for 1*CLK_PER;
-        enable <= '1';
-        wait for 10*CLK_PER;
-        enable <= '0';
-        wait for 6*CLK_PER;
-        enable <= '1';
-        wait for 3*CLK_PER;
-        enable <= '0';
-        wait for 1*CLK_PER;
-        wait for 25*CLK_PER;
-        report "End of Test Case 1" -- 560 ns
-		severity WARNING;
-
-        -- Test Case 2: Elevator takes pasenger to their destination
-        input_array <= "100010"; -- destination on 2nd floor
-        wait for 1*CLK_PER;
-        enable <= '1';
         wait for 2*CLK_PER;
-        enable <= '0';
-        wait for 24*CLK_PER;
-        report "End of Test Case 2" -- 1140 ns
-		severity WARNING;
 
-        input_array <= "010010"; -- floor call at floor 2
-        wait for 1*CLK_PER;
-        enable <= '1';
-        wait for 2*CLK_PER;
-        enable <= '0';
-        wait for 24*CLK_PER;
+        -- Test Case 1: Only 1 elevator responds to  floor call down at floor 4
+        input_array <= "000100"; -- floor call going down at floor 4
+        -- wait for 1*CLK_PER; enable <= '1'; wait for 1*CLK_PER; enable <= '0'; -- enter input
+        -- wait for 14*CLK_PER;
+        -- input_array <= "100001"; -- destination is at floor 1 
+        -- wait for 1*CLK_PER; enable <= '1'; wait for 1*CLK_PER; enable <= '0'; -- enter input
+        -- wait for 15*CLK_PER;       
+        -- report "End of simulation"
+        -- severity FAILURE;
 
+        -- Test Case 2: Picking up floor calls while heading up
+        -- input_array <= "011000"; -- floor call going up at floor 8
+        -- wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; -- enter input
+        -- wait for 3*CLK_PER;
+        -- input_array <= "000110"; -- floor call going down at floor 6
+        -- wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; -- enter input
+        -- wait for 3*CLK_PER;
+        -- input_array <= "010111"; -- floor call going up at floor 5
+        -- wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; -- enter input
+        -- wait for 30*CLK_PER;
+        -- report "End of simulation"
+        -- severity FAILURE;
+
+        -- Test case 3: Picking up floor calls while heading down
+        -- input_array <= "101001"; -- send up to floor 9
+        -- wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        -- input_array <= "001001"; -- send up to floor 9
+        -- wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        -- wait for 35*CLK_PER;
+        -- input_array <= "000001"; -- floor call down at floor 1
+        -- wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        -- input_array <= "000011"; -- floor call down at floor 3
+        -- wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        -- input_array <= "000010"; -- floor call down at floor 2
+        -- wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        -- wait for 30*CLK_PER;
+        -- report "End of simulation"
+        -- severity FAILURE;
+
+        -- Test Case 4:
+        input_array <= "011000"; -- floor call up at floor 8
+        wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        input_array <= "010111"; -- floor call up at floor 7
+        wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        input_array <= "000110"; -- floor call down at floor 6
+        wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        wait for 30*CLK_PER;
         report "End of simulation"
         severity FAILURE;
 

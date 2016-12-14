@@ -58,7 +58,7 @@ begin
     check_floor_stop: process(clk, i_current_floor, destination_array, floor_call_array_up, floor_call_array_down, i_direction, destination)
     begin
         if rising_edge(clk) then
-            -- check if we are at a destination floor or at floor call floor
+            -- check if we are at a destination floor
             if(destination_array(to_integer(i_current_floor)) = '1' ) then
                 floor_stop <= '1';
             -- elevator in idle and floor call at current_floor
@@ -71,7 +71,7 @@ begin
             elsif(destination = '1' AND floor_call_array_down(to_integer(i_current_floor)) = '1' and i_direction = '0') then
                 floor_stop <= '1';
 				-- check if there is a floor call and there is no destination
-				elsif(destination = '0' AND floor_call_array_up(to_integer(i_current_floor)) = '1') then
+			elsif(destination = '0' AND floor_call_array_up(to_integer(i_current_floor)) = '1') then
                 floor_stop <= '1';
             -- check if there is a floor call and there is no destination
             elsif(destination = '0' AND floor_call_array_down(to_integer(i_current_floor)) = '1') then
@@ -184,7 +184,7 @@ begin
 	end process;
 
     -- describe logic for determining next state
-    process(floor_call, floor_stop, i_direction, destination, i_current_floor, floor_changed, destination_array)
+    process(floor_call, floor_stop, i_direction, destination, i_current_floor, floor_changed, destination_array, in_idle)
         begin
         -- set floor_stop bit before entering case statement
 		--floor_stop <= check_floor_stop(i_current_floor, destination_array, floor_call_array, i_direction);

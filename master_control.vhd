@@ -74,7 +74,7 @@ begin
 								report "this is individual floor calls: " & integer'image(to_integer(unsigned(individual_floor)));
 								if individual_floor(floor_call_dest) = '1' Then
 									report "this is insided to set check1 back to zero";
-									check1 := '0';
+									--check1 := '0';
 									exit;
 								end if;
 							else
@@ -88,7 +88,7 @@ begin
 							if i < num_elevators +1 Then
 								individual_floor := floor_array_down(((number_floors)+(i-1)*(number_floors))-1 downto (number_floors)*(i-1));
 								if individual_floor(floor_call_dest) = '1' Then
-									check1 := '0';
+									--check1 := '0';
 									exit;
 								end if;
 							else
