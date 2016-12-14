@@ -48,9 +48,13 @@ add wave -group Master -radix binary /state_of_machine
 add wave -group Master -radix binary /M_control/floor_array_up
 add wave -group Master -radix binary /M_control/floor_array_down
 add wave -group Master -radix binary {/M_control/input_array[5]}
-add wave -group Master -radix binary /M_control/input/check
+add wave -group Master -radix binary /M_control/input/check1
+add wave -group Master -radix binary /M_control/input/check2
+add wave -group Master -radix binary /M_control/input/check3
+add wave -group Master -radix binary /M_control/input/check4
+add wave -group Master -radix binary /M_control/input/check5
 add wave -group Master -radix binary /M_control/input_array
-add wave -group Master -radix binary /M_control/double_floor_calls 
+add wave -group Master -radix binary /M_control/input/individual_floor 
 add wave -group Master -radix binary /M_control/enable 
 add wave -group Master -radix binary /M_control/states
 add wave -group Master -radix binary /M_control/clk
