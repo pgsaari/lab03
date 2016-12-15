@@ -205,11 +205,13 @@ begin
 	    end process input_clk_proc;
 ----------------------------------------------------
 
+
+----- Test cases. Run one at a time by uncommenting the test case you want to run.------------------
     vectors: process begin
         wait for 2*CLK_PER;
 
         -- Test Case 1: Only 1 elevator responds to  floor call down at floor 4
-        input_array <= "000100"; -- floor call going down at floor 4
+        --input_array <= "000100"; -- floor call going down at floor 4
         -- wait for 1*CLK_PER; enable <= '1'; wait for 1*CLK_PER; enable <= '0'; -- enter input
         -- wait for 14*CLK_PER;
         -- input_array <= "100001"; -- destination is at floor 1 
@@ -248,15 +250,62 @@ begin
         -- severity FAILURE;
 
         -- Test Case 4:
-        input_array <= "011000"; -- floor call up at floor 8
+        -- input_array <= "011000"; -- floor call up at floor 8
+        -- wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        -- input_array <= "010111"; -- floor call up at floor 7
+        -- wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        -- input_array <= "000110"; -- floor call down at floor 6
+        -- wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        -- wait for 30*CLK_PER;
+        -- report "End of simulation"
+        -- severity FAILURE;
+
+        -- Test Case 5:
+        -- input_array <= "101001"; -- send up to floor 9
+        -- wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        -- input_array <= "001001"; -- send up to floor 9
+        -- wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        -- wait for 35*CLK_PER;
+        -- input_array <= "000001"; -- floor call down at floor 1
+        -- wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        -- input_array <= "000010"; -- floor call down at floor 2
+        -- wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        -- input_array <= "010011"; -- floor call up at floor 3
+        -- wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        -- wait for 30*CLK_PER;
+        -- report "End of simulation"
+        -- severity FAILURE;
+
+        -- Test Case 6
+        input_array <= "010000"; -- Floor call up at ground floor
         wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
-        input_array <= "010111"; -- floor call up at floor 7
+        input_array <= "110101"; -- destination up at floor 5
+        input_choose_elevator <= "000"; -- specify that destination is for 1st elevator
+        wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        input_array <= "110100"; -- destination up at floor 4
+        input_choose_elevator <= "000"; -- specify that destination is for 1st elevator
         wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
         input_array <= "000110"; -- floor call down at floor 6
         wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
-        wait for 30*CLK_PER;
+        wait for 20*CLK_PER;
+        input_array <= "100011"; -- destination down to floor 3
+        input_choose_elevator <= "001"; -- specify that destination is for 1st elevator
+        wait for (0.5)*CLK_PER; enable <= '1'; wait for (0.5)*CLK_PER; enable <= '0'; wait for 3*CLK_PER; -- enter input
+        wait for 10*CLK_PER;
         report "End of simulation"
         severity FAILURE;
 
+        -- Test Case 7: Same as test case 1 but the input is entered twice
+        -- input_array <= "000100"; -- floor call going down at floor 4
+        -- wait for 1*CLK_PER; enable <= '1'; wait for 1*CLK_PER; enable <= '0'; -- enter input
+        -- wait for 1*CLK_PER; enable <= '1'; wait for 1*CLK_PER; enable <= '0'; -- enter input
+        -- wait for 14*CLK_PER;
+        -- input_array <= "100001"; -- destination is at floor 1 
+        -- wait for 1*CLK_PER; enable <= '1'; wait for 1*CLK_PER; enable <= '0'; -- enter input
+        -- wait for 15*CLK_PER;       
+        -- report "End of simulation"
+        -- severity FAILURE;
+
     end process vectors;
+------------------------------------ End Test Cases ------------------------------------------------------------------------
 end architecture stimulus;

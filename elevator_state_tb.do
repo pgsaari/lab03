@@ -38,6 +38,7 @@ add wave -group Elevator2 -radix binary /floor_control2/enable
 add wave -divider -height 10 Inputs
 
 add wave -radix binary /input_array
+add wave -radix binary /input_choose_elevator
 add wave -radix binary /enable
 
 add wave -group Master -radix binary /M_control/enable_floor_control
@@ -51,7 +52,6 @@ add wave -group Master -radix binary /M_control/input/check2
 add wave -group Master -radix binary /M_control/input/check3
 add wave -group Master -radix binary /M_control/input/check4
 add wave -group Master -radix binary /M_control/input/check5
-add wave -group Master -radix binary /M_control/input_array
 add wave -group Master -radix binary /M_control/input/individual_floor 
 
 run 1000 ns
