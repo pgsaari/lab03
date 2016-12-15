@@ -6,10 +6,9 @@ USE ieee.numeric_std.all;
 
 entity seven_seg is
 port(
-	state: in std_logic_vector(2 downto 0);
-	floor: in std_logic_vector(3 downto 0);
-
-	segs: out	std_logic_vector(6 downto 0)
+	state: in std_logic_vector(2 downto 0); --THIS IS THE STATE OF THE ELEVATOR
+	floor: in std_logic_vector(3 downto 0); --THIS IS THE CURRENT FLOOR OF THE ELEVATOR
+	segs: out	std_logic_vector(6 downto 0) --OUTPUT OUT TO SEVEN SEG DISPLAY
 	);
 end entity;
 	

@@ -9,20 +9,22 @@ generic (
 );
 port(
     clk: in std_logic;
-
+	
+	 -- used to represent floor calls that wish to go up
     -- each bit represents a floor: 0 = no call, 1 = up
     floor_call_array_up: in std_logic_vector(num_floors-1 downto 0) := (others => '0');
 	 
+	 -- used to represent floor calls that wish to go up
 	 -- each bit represents a floor: 0 = no call, 1 = down
     floor_call_array_down: in std_logic_vector(num_floors-1 downto 0) := (others => '0');
 
     -- buttons pressed inside of elevator
     destination_array: in std_logic_vector(num_floors-1 downto 0) := (others => '0');
 
-    direction: out std_logic;
+    direction: out std_logic; -- direction of elevator
     door: out std_logic; -- 1 for open, 0 for close
     current_floor: out std_logic_vector(3 downto 0) := (others => '0'); -- 16 floors max
-    state_out: out std_logic_vector(2 downto 0)
+    state_out: out std_logic_vector(2 downto 0) -- state of the elevator
 ); end entity;
 
 architecture logic of elevator_state is
@@ -41,7 +43,7 @@ architecture logic of elevator_state is
     signal floor_stop: std_logic := '0'; 
 
     signal i_direction: std_logic := '1'; --default direction up
-    signal i_current_floor: unsigned(3 downto 0) := (others => '0');
+    signal i_current_floor: unsigned(3 downto 0) := (others => '0'); --current floor of elevator
 	
     -- destination = any button pressed inside of elevator
     signal destination: std_logic := '0'; -- are we heading towards a destination?
@@ -52,9 +54,8 @@ architecture logic of elevator_state is
 begin	
 
     -- process: check_floor_stop
-     -- description: checks if the elevator needs to stop at the current floor
-     --     for either a floor call in the same direction of the elevator or
-     --     the current floor is a destination floor
+    -- description: checks if the elevator needs to stop at the current floor
+    -- for either a floor call in the same direction of the elevator or the current floor is a destination floor
     check_floor_stop: process(clk, i_current_floor, destination_array, floor_call_array_up, floor_call_array_down, i_direction, destination)
     begin
         if rising_edge(clk) then
@@ -83,10 +84,7 @@ begin
     end process;
 
 	 -- process: check_destination_calls
-     -- description: loops through destination_array to check if the elevator
-     --     is heading towards a destination or not
-     -- input: 
-     -- output: 
+    -- description: loops through destination_array to check if the elevator is heading towards a destination or not
     check_destination_bits: process(clk, destination_array, floor_call_array_up, floor_call_array_down)
     begin
     if(rising_edge(clk)) then

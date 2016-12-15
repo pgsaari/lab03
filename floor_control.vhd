@@ -1,4 +1,4 @@
- library ieee;
+library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.std_logic_unsigned.all;
@@ -11,14 +11,14 @@ port(
    clk: in std_logic; -- This is clock
 	input_clock : in std_logic; -- This is 50Mhz clock for input
 	direction: in std_logic; -- This is direction of elevator
-	current_floor: in std_logic_vector(3 downto 0); -- This is current floor of the elevator(Max amount of floors is 15)
+	current_floor: in std_logic_vector(3 downto 0); -- This is current floor of the elevator(Max amount of floors is 16)
 	enable: in std_logic; --Used to tell floor_control when to latch in data
-	state: in std_logic_vector(2 downto 0);
+	state: in std_logic_vector(2 downto 0); --current state of elevator
 	
-	-- This is the input from top level which essentialy comes from board switches
-	--Bit '4' specifies which array to write to
-	--Bit '3' specifies what direction to specify when writing to array
-	--Bit '2' downto '0' are used to specify the floor
+	--This is the input from top level which essentialy comes from board switches
+	--Bit '5' specifies which array to write to ( 1 is destination array) ( 0 is floor call array)
+	--Bit '4' specifies what direction to specify when writing to array ( 1 is up) ( 0 is down)
+	--Bit '3' downto '0' are used to specify the floor
 	input_array: in std_logic_vector(5 downto 0); 
 	
     -- each bit represents a floor: 1 = up , 0 = no call
@@ -49,35 +49,38 @@ BEGIN
 --'0' There is no current floor_call at specified floor(index)
 floor: process(clk, current_floor, enable, input_clock) begin
 	if(rising_edge(input_clock)) then -- 50 MHZ clock
+	
+		-- THIS PART IS USED TO SET A FLOOR CALL OR DESTINATION CALL
 		if enable = '1' then
-			if which_array = '0' Then
-				if which_direction = '0' Then
+			if which_array = '0' Then -- THIS IS A FLOOR CALL
+				if which_direction = '0' Then -- FLOOR CALL IS TO GO DOWN
 					i_floor_call_array_down(to_integer(which_floor)) <= '1';
-				else -- which_direction = '1'
+				else -- which_direction = '1' FLOOR CALL IS TO GO UP
 					i_floor_call_array_up(to_integer(which_floor)) <= '1';
 				end if;
-			else -- which array = 1
+			else -- which array = 1 THIS IS A DESTINATION CALL
 				i_destination_array(to_integer(which_floor)) <= '1';
 			end if;		
 		end if;
 	
+		--THIS PART IS USED TO DELETE A FLOOR CALL OR DESTINATION CALL ONCE THE ELEVATOR REACHES THE DESIGNATED FLOOR
 		if (clk = '1') then -- real time clock that elevators run on
-			if i_destination_array(to_integer(unsigned(current_floor))) = '1' Then
+			if i_destination_array(to_integer(unsigned(current_floor))) = '1' Then --FIRST CHECK IF CURRENT FLOOR IS A DESTINATION FLOOR
 				i_destination_array(to_integer(unsigned(current_floor))) <= '0';
 			end if;
-
+			--USED TO CHECK IF THE ELEVATOR IS IDLE AND THERE IS A FLOOR CALL TO GO UP ON THE ELEVATORS CURRENT FLOOR
 			if (state = "000" and (i_floor_call_array_up(to_integer(unsigned(current_floor))) = '1')) then
 				i_floor_call_array_up(to_integer(unsigned(current_floor))) <= '0';
 			end if;
-			
+			--USED TO CHECK IF ELEVATOR IS IDLE AND THERE IS A FLOOR CALL TO GO DOWN ON THE ELEVATORS CURRENT FLOOR
 			if (state = "000" and (i_floor_call_array_down(to_integer(unsigned(current_floor))) = '1')) then
 				i_floor_call_array_down(to_integer(unsigned(current_floor))) <= '0';
 			end if;
-
+			--CHECK IF THE THERE IS A FLOOR CALL IN THE SAME DIRECTION OF THE ELEVATOR (DIRECTION UP)
 			if direction = '1' AND i_floor_call_array_up(to_integer(unsigned(current_floor))) = '1' Then
 				i_floor_call_array_up(to_integer(unsigned(current_floor))) <= '0';
 			end if;
-			
+			--CHECK IF THE THERE IS A FLOOR CALL IN THE SAME DIRECTION OF TEH ELEVATOR (DIRECTION DOWN)
 			if direction = '0' AND i_floor_call_array_down(to_integer(unsigned(current_floor))) = '1' Then
 				i_floor_call_array_down(to_integer(unsigned(current_floor))) <= '0';
 			end if;
@@ -87,12 +90,12 @@ end process;
 
 --Sets latched data from board to easy to use variables
 latch: process(input_array) begin
-	which_array <= input_array(5);
-	which_direction <= input_array(4);
-	which_floor <= unsigned(input_array(3 downto 0));
+	which_array <= input_array(5); -- if 1 it is destination array, if 0 it is floor call
+	which_direction <= input_array(4); -- if 1 direction is up, if 0 direction is down
+	which_floor <= unsigned(input_array(3 downto 0)); -- specifies floor of destination call or floor call
 end process;
 
-floor_call_array_up <= i_floor_call_array_up;
+floor_call_array_up <= i_floor_call_array_up; 
 floor_call_array_down <= i_floor_call_array_down;
 destination_array <= i_destination_array;
 end architecture logic;
